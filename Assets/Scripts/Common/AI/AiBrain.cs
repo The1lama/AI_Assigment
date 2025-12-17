@@ -9,7 +9,7 @@ namespace Common.AI
     public class AiBrain : CharacterFactory
     {
         [Header("Setup guy")]
-        [SerializeField] private float speed = 5;
+        [SerializeField] private float _speed = 5;
         [SerializeField] private float maxHealth = 100;
         [SerializeField] private float shootDistance = 20f;
         
@@ -51,7 +51,7 @@ namespace Common.AI
             
             InitializeView();
             
-            _aiWalk.InitializeAgent(speed);
+            _aiWalk.InitializeAgent(_speed);
             
         }
 
@@ -66,9 +66,6 @@ namespace Common.AI
             _view.obstructionLayerMask = obstacleLayerMask;
         }
 
-        
-        
-        
         
         private void Update()
         {
@@ -91,7 +88,7 @@ namespace Common.AI
                 
                 // rotate guy towards target within 10 degrees of it 
                 // then it can use weapon
-                if (angle <= 0.99f ) 
+                if (angle <= 0.95f ) 
                     RotateObject(toTarget);
                 else
                     _weapon.Shoot();
