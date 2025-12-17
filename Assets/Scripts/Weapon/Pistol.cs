@@ -8,7 +8,6 @@ namespace Weapon
     {
         [SerializeField, Header("Time before new bullet")] private float shotCooldown = 2f;
         [SerializeField, Header("Bullet Settings")] private GameObject bulletPrefab;
-        [SerializeField] private Transform barrelEnd;
         public override float timeUntilNextShot { get; set; }
         public override bool canShoot { get; set; }
 
@@ -23,7 +22,7 @@ namespace Weapon
         {
             if (canShoot)
             {
-                BulletSpawn(bulletPrefab, barrelEnd.position,  barrelEnd.rotation);
+                BulletSpawn(bulletPrefab, transform.position,  transform.rotation);
                 
                 // TODO: Add in WeaponFactory a function that spawns in new bullets and fly's towards destination
                 

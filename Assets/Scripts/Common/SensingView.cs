@@ -3,35 +3,19 @@ using UnityEngine;
 
 namespace Common
 {
-    public class GuardSensor : MonoBehaviour
+    public class SensingView : MonoBehaviour
     {
         [Header("Target Layer")]
-        public LayerMask targetLayer;
+        public LayerMask targetLayer { get; set; }
 
-        [Header("Attack Range")]
-        public float attackRange = 5;
-        
         [Header("View")]
-        public float viewingDistance = 10f;
-        [SerializeField, Range(0f, 180f)] private float fov = 90f;
-        public LayerMask obstructionLayerMask;
+        public float viewingDistance { get; set; }
+        public float fov { get; set; }
+        public LayerMask obstructionLayerMask { get; set; }
         
         [SerializeField] private bool isInRangeAndSeen;
 
         [Header("Debug"), SerializeField] private bool isDebug = true;
-
-
-        private void Update()
-        {
-            var enemyHit = Physics.OverlapSphere(transform.position, viewingDistance, targetLayer);
-            foreach (var hit in enemyHit)
-            {
-                TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS, out float distanceToTarget);
-
-
-            }
-        }
-
 
         /// <summary>
         /// Checks if object has line of sight to Target
@@ -105,9 +89,6 @@ namespace Common
                 Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewingDistance);
                 Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewingDistance);
                 
-                
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(transform.position, attackRange);
             }
         }
     }

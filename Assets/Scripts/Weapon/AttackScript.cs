@@ -15,13 +15,7 @@ namespace Weapon
             else Debug.Log($"Got a gun: {name}");
         }
 
-        private void Update()
-        {
-            Shoot();
-        }
-
-
-        private void Shoot()
+        public void Shoot()
         {
             if (gun == null) return;
             gun.Shoot();
