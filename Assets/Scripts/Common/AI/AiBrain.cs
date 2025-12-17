@@ -1,11 +1,9 @@
-using System;
-using Common;
 using Factory;
 using UnityEngine;
 using UnityEngine.AI;
 using Weapon;
 
-namespace Player.AI
+namespace Common.AI
 {
     [RequireComponent(typeof(NavMeshAgent), typeof(SensingView), typeof(AttackScript))]
     public class AiBrain : CharacterFactory
