@@ -12,10 +12,6 @@ namespace Common
         public float viewingDistance { get; set; }
         public float fov { get; set; }
         public LayerMask obstructionLayerMask { get; set; }
-        
-        [SerializeField] private bool isInRangeAndSeen;
-
-        [Header("Debug"), SerializeField] private bool isDebug = true;
 
         /// <summary>
         /// Checks if object has line of sight to Target
@@ -43,6 +39,14 @@ namespace Common
             return toTarget < viewingDistance + 0.5f;
         }
 
+        public bool GetDotProduct(Vector3 toTarget)
+        {
+            var dotProd = Vector3.Dot(transform.TransformDirection(Vector3.forward), (toTarget).normalized);
+            var cosineThreshold = Mathf.Cos(fov * Mathf.Deg2Rad * 0.5f);
+            return dotProd >= cosineThreshold;
+        }
+        
+
         public bool TrySeeTarget(Transform target, out Vector3 lastKnownPosition, out bool hasLineOfSight, out float toTargetDistance)
         {
             // Check flow
@@ -59,10 +63,8 @@ namespace Common
             if (!WithinDistanceToTarget(toTarget.magnitude)) return false;      // Gets the distance from guard to target
 
             // Check the cone vision from guard to target if the targets in view
-            var dotProd = Vector3.Dot(transform.TransformDirection(Vector3.forward), (toTarget).normalized);
-            var cosineThreshold = Mathf.Cos(fov * Mathf.Deg2Rad * 0.5f);
-            isInRangeAndSeen = dotProd >= cosineThreshold;
-            if (!isInRangeAndSeen) return false;
+
+            if (!GetDotProduct(toTarget)) return false;
 
             // Check LIne of sight from guard to target 
             if (!TryLineOfSight(target)) return false;
@@ -71,25 +73,6 @@ namespace Common
             hasLineOfSight = true;
             toTargetDistance = toTarget.magnitude;
             return true;
-        }
-        
-        private void OnDrawGizmos()
-        {
-            if (isDebug)
-            {
-                Gizmos.color = isInRangeAndSeen ? Color.green : Color.red;
-                Gizmos.DrawWireSphere(transform.position, viewingDistance);
-                
-                
-                Vector3 rightBoundary = Quaternion.Euler(0, fov * 0.5f, 0) * transform.TransformDirection(transform.forward);
-                Vector3 leftBoundary = Quaternion.Euler(0, -fov * 0.5f, 0) * transform.TransformDirection(transform.forward);
-
-                // gets shows wrong direction when facing -z dont care enough to fix right now.
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewingDistance);
-                Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewingDistance);
-                
-            }
         }
     }
 }

@@ -17,7 +17,11 @@ namespace Weapon
 
         public void Shoot()
         {
-            if (gun == null) return;
+            if (gun == null)
+            {
+                Debug.LogWarning("This guy does not have a gun script");
+                return;
+            }
             gun.Shoot();
         }
     }
