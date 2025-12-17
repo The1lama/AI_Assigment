@@ -5,7 +5,7 @@ using Weapon;
 
 namespace Common.AI
 {
-    [RequireComponent(typeof(NavMeshAgent), typeof(SensingView), typeof(AttackScript))]
+    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(AiWalk))]
     public class AiBrain : CharacterFactory
     {
         [Header("Setup guy")]
@@ -24,10 +24,11 @@ namespace Common.AI
         [Header("Debug")]
         [SerializeField]  private bool debug = true;
         [SerializeField] private bool isInRangeAndSeen;
+        public Transform target;
         
         private SensingView _view;
         private AttackScript _weapon;
-        private NavMeshAgent _agent;
+        private AiWalk _aiWalk;
         
         #region override Stuff
 
@@ -43,12 +44,14 @@ namespace Common.AI
         {
             _view = GetComponent<SensingView>();
             _weapon = GetComponent<AttackScript>();
+            _aiWalk = GetComponent<AiWalk>();
             
             healthMax = maxHealth;
             health = maxHealth;
             
             InitializeView();
-            InitializeAgent();
+            
+            _aiWalk.InitializeAgent(speed);
             
         }
 
@@ -63,17 +66,14 @@ namespace Common.AI
             _view.obstructionLayerMask = obstacleLayerMask;
         }
 
-        private void InitializeAgent()
-        {
-            _agent = GetComponent<NavMeshAgent>();
-            _agent.speed = speed;
-        }
         
         
         
         
         private void Update()
         {
+            SetDestination(target.position);
+            
             TryFindEnemy();
         }
 
@@ -89,9 +89,9 @@ namespace Common.AI
                 var toTarget = lastKnownPosition - transform.position;
                 var angle = AngleToTarget(toTarget);
                 
-                // rotate guy towards target within a 6degreas of it 
+                // rotate guy towards target within 10 degrees of it 
                 // then it can use weapon
-                if (angle <= 0.97f ) 
+                if (angle <= 0.99f ) 
                     RotateObject(toTarget);
                 else
                     _weapon.Shoot();
@@ -100,9 +100,9 @@ namespace Common.AI
 
         private void RotateObject(Vector3 targetPosition)
         {
-            Vector3 direction = targetPosition.normalized;
+            Vector3 direction = targetPosition.normalized*3;
             var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 10*Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
         }
 
         private float AngleToTarget(Vector3 targetPosition)
@@ -112,7 +112,7 @@ namespace Common.AI
         
         public void SetDestination(Vector3 destination)
         {
-            _agent.SetDestination(destination);
+            _aiWalk.SetDestination(destination);
         }
 
         private void OnDrawGizmosSelected()
