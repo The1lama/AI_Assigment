@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Common;
 using Common.Interfaces;
@@ -34,7 +35,6 @@ namespace Player
 
         #endregion
 
-
         private void Awake()
         {
             _view = GetComponent<SensingView>();
@@ -57,8 +57,17 @@ namespace Player
             _view.fov = setFov;
             _view.obstructionLayerMask = obstacleLayerMask;
         }
-        
 
+        private void OnEnable()
+        {
+            GameManager.Instance.allEntities.Add(gameObject);
+        }
+
+        private void OnDisable()
+        {
+            if(GameManager.Instance != null)
+                GameManager.Instance.allEntities.Remove(gameObject);
+        }
 
 
         private void Update()
@@ -79,12 +88,31 @@ namespace Player
             {
                 if(!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS, out float distanceToTarget)) continue;
                 
-                _weapon.Shoot();
+                // if guy to to far away to shoot it should walk closer to target and try again if guy sees target
+                if(distanceToTarget > shootDistance) break;
+                var toTarget = lastKnownPosition - transform.position;
+                var angle = AngleToTarget(toTarget);
+                
+                // rotate guy towards target within 10 degrees of it 
+                // then it can use weapon
+                if (angle <= 0.95f ) 
+                    RotateObject(toTarget);
+                else
+                    _weapon.Shoot();
             }
         }
-        
-        
-        
+
+        private void RotateObject(Vector3 targetPosition)
+        {
+            Vector3 direction = targetPosition.normalized*3;
+            var rotation= Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
+        }
+
+        private float AngleToTarget(Vector3 targetPosition)
+        {
+            return Vector3.Dot(transform.forward, targetPosition.normalized);
+        }
         
         
         

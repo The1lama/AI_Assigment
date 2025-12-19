@@ -1,22 +1,28 @@
+using System;
+using System.Collections.Generic;
 using Factory;
+using Statemachine;
 using UnityEngine;
 using UnityEngine.AI;
 using Weapon;
 
 namespace Common.AI
 {
-    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(AiWalk))]
+    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(StateManager))]
     public class AiBrain : CharacterFactory
     {
         [Header("Setup guy")]
         [SerializeField] private float _speed = 5;
         [SerializeField] private float maxHealth = 100;
         [SerializeField] private float shootDistance = 20f;
+        public GameObject leader;
+        
         
         [Header("View")]
         [SerializeField] private float setMaxViewingDistance = 30f;
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
+        private bool seesEnemy = false;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
@@ -24,11 +30,22 @@ namespace Common.AI
         [Header("Debug")]
         [SerializeField]  private bool debug = true;
         [SerializeField] private bool isInRangeAndSeen;
-        public Transform target;
-        
+
+
+        private void OnEnable()
+        {
+            GameManager.Instance.allEntities.Add(this.gameObject);
+        }
+
+        private void OnDisable()
+        {
+            if(GameManager.Instance != null)
+                GameManager.Instance.allEntities.Remove(gameObject);
+        }
+
+
         private SensingView _view;
         private AttackScript _weapon;
-        private AiWalk _aiWalk;
         
         #region override Stuff
 
@@ -36,7 +53,13 @@ namespace Common.AI
         public override float viewingDistance { get; set; }
         public override float healthMax { get; set; }
         public override LayerMask layerMask { get; set; }
-        
+
+        public override float speed
+        {
+            get => _speed;
+            set => _speed = value;
+        } 
+
         #endregion
         
         
@@ -44,14 +67,12 @@ namespace Common.AI
         {
             _view = GetComponent<SensingView>();
             _weapon = GetComponent<AttackScript>();
-            _aiWalk = GetComponent<AiWalk>();
             
             healthMax = maxHealth;
             health = maxHealth;
             
             InitializeView();
             
-            _aiWalk.InitializeAgent(_speed);
             
         }
 
@@ -69,12 +90,16 @@ namespace Common.AI
         
         private void Update()
         {
-            SetDestination(target.position);
             
-            TryFindEnemy();
+            seesEnemy = TryFindEnemy();
+
+            if (seesEnemy) return;
+
         }
 
-        private void TryFindEnemy()
+
+
+        private bool TryFindEnemy()
         {
             var enemyHit = Physics.OverlapSphere(transform.position, viewingDistance, layerMask);
             foreach (var hit in enemyHit)
@@ -92,12 +117,14 @@ namespace Common.AI
                     RotateObject(toTarget);
                 else
                     _weapon.Shoot();
+                return true;
             }
+            return false;
         }
 
         private void RotateObject(Vector3 targetPosition)
         {
-            Vector3 direction = targetPosition.normalized*3;
+            Vector3 direction = targetPosition.normalized;
             var rotation= Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
         }
@@ -105,11 +132,6 @@ namespace Common.AI
         private float AngleToTarget(Vector3 targetPosition)
         {
             return Vector3.Dot(transform.forward, targetPosition.normalized);
-        }
-        
-        public void SetDestination(Vector3 destination)
-        {
-            _aiWalk.SetDestination(destination);
         }
 
         private void OnDrawGizmosSelected()
