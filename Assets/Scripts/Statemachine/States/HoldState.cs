@@ -38,12 +38,10 @@ public class HoldState : StateMachineFactory
         me.transform.rotation = Quaternion.Slerp(me.agent.transform.rotation, targetRotation, 1.5f*Time.deltaTime);
 
 
-        if (targetRotation == me.transform.rotation)    // does not work with 180 degrees but works with 90 
-        {
-            currentRotationIndex = ( currentRotationIndex += 1 ) % angles.Length; 
-            startRotation = me.transform.rotation;
-        }
-        
+        if (targetRotation != me.transform.rotation) return; // does not work with 180 degrees but works with 90 
+        currentRotationIndex = ( currentRotationIndex += 1 ) % angles.Length; 
+        startRotation = me.transform.rotation;
+
     }
 
     
