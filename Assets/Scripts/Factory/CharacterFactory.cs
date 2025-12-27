@@ -26,12 +26,14 @@ namespace Factory
 
         public virtual void TakeHeal(float healing)
         {
+            if (!canTakeHeal) return;
             health += healing;
-            if (health > healthMax)
+            if (health >= healthMax)
             {
                 health = healthMax;
                 needsHealth = false;
             }
+            Debug.Log(health);
 
             canTakeHeal = false;
             StartCoroutine(ResetHealCooldown());
@@ -46,11 +48,13 @@ namespace Factory
 
         public virtual void TakeDamage(float damage)
         {
+            if (!canTakeDamage) return;
             health -= damage;
-            if (health <= healthMax / 4) needsHealth = true;
+            if (health <= healthMax / 3) needsHealth = true;
             if (health <= 0)
                 Destroy(this.gameObject);
             canTakeDamage = false;
+            StartCoroutine(ResetDamageCooldown());
         }
         
         private IEnumerator ResetDamageCooldown()

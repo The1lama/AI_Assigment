@@ -13,8 +13,6 @@ namespace Statemachine.States
 
         public override void OnStateUpdate(StateManager me)
         {
-            float distanceToLeader = (me.transform.position - me.leader.position).magnitude;
-
 
             if (!me.agent.pathPending)
             {
@@ -31,6 +29,10 @@ namespace Statemachine.States
             
         }
 
+        
+        
+        
+        
         public override void OnStateExit(StateManager me)
         {
         }

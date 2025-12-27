@@ -26,16 +26,17 @@ namespace Statemachine
         public Transform leader;
         public List<GameObject> _group;
         public float separationDistance = 3f;
-        [HideInInspector] public NavMeshAgent agent;
-        [HideInInspector] public  SteeringAgent steeringAgent;
+        public LayerMask teamLayerMask;
+        
+        internal NavMeshAgent agent;
+        internal  SteeringAgent steeringAgent;
 
         
         [Header("MediClass")]
         public bool isMedi = false;
         public float helpRadius = 7f;
-        private Collider[] _comradesHurtColliders = new Collider[2]; 
         public bool onHealingRoute = false;
-        [HideInInspector] public List<GameObject> hurtComrades = new List<GameObject>();
+        internal List<GameObject> hurtComrades = new List<GameObject>();
 
         public StateMachineFactory[] stateList = new StateMachineFactory[] {
             new FollowState(),
@@ -147,13 +148,14 @@ namespace Statemachine
         private List<GameObject> FindHurtComrades()
         {
             hurtComrades.Clear();// not working right now
-            var amountOfHurtComrades = Physics.OverlapSphereNonAlloc(transform.position, helpRadius, _comradesHurtColliders, gameObject.layer);
-            Debug.Log(amountOfHurtComrades);
-            for (int i = 0; i < amountOfHurtComrades; i++)
+            var amountOfHurtComrades = Physics.OverlapSphere(transform.position, helpRadius, teamLayerMask);
+            for (int i = 0; i < amountOfHurtComrades.Length; i++)
             {
-                var cHealth = _comradesHurtColliders[i].GetComponent<CharacterFactory>();
-                if(cHealth != null && cHealth.needsHealth && _comradesHurtColliders[i].CompareTag(this.gameObject.tag)) 
+                var cHealth = amountOfHurtComrades[i].GetComponent<CharacterFactory>();
+                if (cHealth != null && cHealth.needsHealth && amountOfHurtComrades[i].CompareTag(this.gameObject.tag))
+                {
                     hurtComrades.Add(cHealth.gameObject);
+                }
             }
 
             return hurtComrades;
@@ -168,11 +170,13 @@ namespace Statemachine
                 _group.Add(memeber.gameObject);
             }
         }
+       
 
         public void SetAgentDestination(Vector3 destination)
         {
             agent.SetDestination(destination);
         }
+        
         
         
         public void RotateOffsetFromLeader()
