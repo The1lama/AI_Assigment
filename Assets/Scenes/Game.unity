@@ -2304,6 +2304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91445de564e57ee4eb4ecf78f100c3a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canTakeHeal: 1
+  canTakeDamage: 1
   setMaxHealth: 100
   shootDistance: 20
   setMaxViewingDistance: 30
@@ -5504,8 +5506,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57b356a4f87ecc4c82d67feb30774a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canTakeHeal: 1
+  canTakeDamage: 1
   _speed: 5
-  maxHealth: 100
+  <healthMax>k__BackingField: 100
   shootDistance: 20
   leader: {fileID: 674297772}
   setMaxViewingDistance: 30
@@ -5582,6 +5586,10 @@ MonoBehaviour:
   separationDistance: 3
   agent: {fileID: 0}
   steeringAgent: {fileID: 0}
+  isMedi: 0
+  helpRadius: 7
+  onHealingRoute: 0
+  hurtComrades: []
 --- !u!114 &1671582367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5980,18 +5988,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57b356a4f87ecc4c82d67feb30774a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canTakeHeal: 1
+  canTakeDamage: 1
   _speed: 5
-  maxHealth: 100
+  <healthMax>k__BackingField: 100
   shootDistance: 20
   leader: {fileID: 674297772}
   setMaxViewingDistance: 30
   setFov: 170
   targetLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   obstacleLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   debug: 1
   isInRangeAndSeen: 0
 --- !u!114 &1867904861
@@ -6012,6 +6022,10 @@ MonoBehaviour:
   separationDistance: 3
   agent: {fileID: 0}
   steeringAgent: {fileID: 0}
+  isMedi: 1
+  helpRadius: 7
+  onHealingRoute: 0
+  hurtComrades: []
 --- !u!114 &1867904862
 MonoBehaviour:
   m_ObjectHideFlags: 0

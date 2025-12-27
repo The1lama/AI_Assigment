@@ -14,8 +14,7 @@ public class HoldState : StateMachineFactory
     private float[] angles = new float[]
     {
         90f,
-        -180f,
-        90,
+        -90f,
     };
     
     
@@ -43,9 +42,6 @@ public class HoldState : StateMachineFactory
         startRotation = me.transform.rotation;
 
     }
-
-    
-    
 
     public override void OnStateExit(StateManager me)
     {

@@ -4,6 +4,7 @@ using Factory;
 using Statemachine;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using Weapon;
 
 namespace Common.AI
@@ -13,7 +14,7 @@ namespace Common.AI
     {
         [Header("Setup guy")]
         [SerializeField] private float _speed = 5;
-        [SerializeField] private float maxHealth = 100;
+        [field: SerializeField] public override float healthMax { get; set; } = 100f;
         [SerializeField] private float shootDistance = 20f;
         public GameObject leader;
         
@@ -51,7 +52,6 @@ namespace Common.AI
 
         public override float health { get; set; }
         public override float viewingDistance { get; set; }
-        public override float healthMax { get; set; }
         public override LayerMask layerMask { get; set; }
 
         public override float speed
@@ -68,8 +68,7 @@ namespace Common.AI
             _view = GetComponent<SensingView>();
             _weapon = GetComponent<AttackScript>();
             
-            healthMax = maxHealth;
-            health = maxHealth;
+            health = healthMax;
             
             InitializeView();
             
@@ -92,11 +91,9 @@ namespace Common.AI
         {
             
             seesEnemy = TryFindEnemy();
-
             if (seesEnemy) return;
 
         }
-
 
 
         private bool TryFindEnemy()

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Interfaces;
 using Common.Lab3_Steering_Swarm.Scripts.AI;
+using Factory;
 using Statemachine.States;
 using UnityEngine;
 using UnityEngine.AI;
@@ -13,12 +15,11 @@ namespace Statemachine
     {
         follow,
         hold,
+        medi,
     }
-    
     
     public class StateManager : MonoBehaviour
     {
-        private StateMachineFactory _currentState;
 
         [Header("Squad")]
         [field: SerializeField] public float offsetAngle { get; set; } = 30f;
@@ -26,25 +27,34 @@ namespace Statemachine
         public List<GameObject> _group;
         public float separationDistance = 3f;
         [HideInInspector] public NavMeshAgent agent;
-        
+        [HideInInspector] public  SteeringAgent steeringAgent;
 
-        public  SteeringAgent steeringAgent;
+        
+        [Header("MediClass")]
+        public bool isMedi = false;
+        public float helpRadius = 7f;
+        private Collider[] _comradesHurtColliders = new Collider[2]; 
+        public bool onHealingRoute = false;
+        [HideInInspector] public List<GameObject> hurtComrades = new List<GameObject>();
 
         public StateMachineFactory[] stateList = new StateMachineFactory[] {
             new FollowState(),
             new HoldState(),
+            new MediState(),
         };
+        private StateMachineFactory _currentState;
+        internal StateMachineFactory lastState;
         
         
         [Header("Inputs")]
         private InputAction holdAction;
         private InputAction followAction;
-        
-        
-        
+        public InputAction mediAction { get; set; }
 
+        
         public void Awake()
         {
+            
             agent = GetComponent<NavMeshAgent>();
             agent.stoppingDistance = separationDistance;
             agent.updateRotation = false;
@@ -79,15 +89,29 @@ namespace Statemachine
                 followAction.performed += FollowActionOnperformed;
                 followAction.Enable();
                 
+                
+                mediAction = new InputAction(
+                    name: "MediAction",
+                    type: InputActionType.Button,
+                    binding: "<Keyboard>/m"
+                );
+                mediAction.performed += mediActionOnperformed;
+                mediAction.Enable();
 
                 
             }
+
+            private void mediActionOnperformed(InputAction.CallbackContext obj)
+            {
+                if(isMedi) SwitchState(stateList[(int)State.medi]);
+            }
+
 
             private void OnDisable()
             {
                 if(followAction != null){ followAction.performed -= FollowActionOnperformed; followAction.Disable();}
                 if(holdAction != null) {holdAction.performed -= HoldActionOnperformed; holdAction.Disable();}
-                
+                if(mediAction != null) {mediAction.performed -= HoldActionOnperformed; mediAction.Disable();}
 
             }
 
@@ -104,12 +128,10 @@ namespace Statemachine
         #endregion
         
 
-        private void SwitchState(StateMachineFactory newState)
+        internal void SwitchState(StateMachineFactory newState)
         {
-            Debug.Log($"SwitchState to {newState}");
-            
             _currentState.OnStateExit(this);
-           
+            lastState = _currentState;
             _currentState = newState;
             _currentState.OnStateEnter(this);
         }
@@ -117,9 +139,27 @@ namespace Statemachine
 
         private void FixedUpdate()
         {
+            if(isMedi && !onHealingRoute && FindHurtComrades().Count > 0) SwitchState(stateList[(int)State.medi]);
+            
             _currentState?.OnStateUpdate(this);
         }
 
+        private List<GameObject> FindHurtComrades()
+        {
+            hurtComrades.Clear();// not working right now
+            var amountOfHurtComrades = Physics.OverlapSphereNonAlloc(transform.position, helpRadius, _comradesHurtColliders, gameObject.layer);
+            Debug.Log(amountOfHurtComrades);
+            for (int i = 0; i < amountOfHurtComrades; i++)
+            {
+                var cHealth = _comradesHurtColliders[i].GetComponent<CharacterFactory>();
+                if(cHealth != null && cHealth.needsHealth && _comradesHurtColliders[i].CompareTag(this.gameObject.tag)) 
+                    hurtComrades.Add(cHealth.gameObject);
+            }
+
+            return hurtComrades;
+        }
+        
+        
 
         private void GetTheGroup()
         {
@@ -146,9 +186,5 @@ namespace Statemachine
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
             transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
         }
-
-        
-        
-        
     }
 }

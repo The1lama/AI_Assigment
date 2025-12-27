@@ -10,7 +10,7 @@ namespace Player
     [RequireComponent(typeof(SensingView), typeof(AttackScript))]
     public class PlayerBrain : CharacterFactory
     {
-        [Header("Setup guy")]
+        [Header("Setup guy")] 
         [SerializeField] private float setMaxHealth = 100f;
         [SerializeField] private float shootDistance = 20f;
         
