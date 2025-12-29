@@ -61,21 +61,21 @@ namespace Player
         private void OnEnable()
         {
             GameManager.Instance.allEntities.Add(gameObject);
+            GameManager.Instance.friendlyEntities.Add(gameObject);
         }
 
         private void OnDisable()
         {
-            if(GameManager.Instance != null)
-                GameManager.Instance.allEntities.Remove(gameObject);
+            if (GameManager.Instance == null) return;
+            
+            GameManager.Instance.allEntities.Remove(gameObject);
+            GameManager.Instance.friendlyEntities.Remove(gameObject);
         }
 
 
         private void Update()
         {
-            
             TryFindEnemy();
-            
-            
         }
 
 

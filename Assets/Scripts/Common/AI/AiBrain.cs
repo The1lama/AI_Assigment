@@ -36,12 +36,26 @@ namespace Common.AI
         private void OnEnable()
         {
             GameManager.Instance.allEntities.Add(this.gameObject);
+            
+            if(gameObject.CompareTag("Friendly"))
+                GameManager.Instance.friendlyEntities.Add(this.gameObject);
+            else if(gameObject.CompareTag("Enemy"))
+                GameManager.Instance.enemyEnteties.Add(this.gameObject);
+            
         }
 
         private void OnDisable()
         {
-            if(GameManager.Instance != null)
-                GameManager.Instance.allEntities.Remove(gameObject);
+            if (GameManager.Instance == null) return; 
+            
+            GameManager.Instance.allEntities.Remove(gameObject);
+            
+            if(gameObject.CompareTag("Friendly"))
+                GameManager.Instance.friendlyEntities.Remove(this.gameObject);
+            else if(gameObject.CompareTag("Enemy"))
+                GameManager.Instance.enemyEnteties.Remove(this.gameObject);
+            
+            
         }
 
 

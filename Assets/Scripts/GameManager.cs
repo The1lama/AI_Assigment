@@ -9,6 +9,8 @@ using Utility;
 public class GameManager : Singleton<GameManager>
 {
     public List<GameObject> allEntities =  new();
+    public List<GameObject> friendlyEntities = new();
+    public List<GameObject> enemyEnteties = new();
     private InputAction hurtAction;
 
     private void Awake()

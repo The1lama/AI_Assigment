@@ -28,10 +28,6 @@ namespace Statemachine.States
             
             
         }
-
-        
-        
-        
         
         public override void OnStateExit(StateManager me)
         {

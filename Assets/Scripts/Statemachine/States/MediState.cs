@@ -23,17 +23,8 @@ namespace Statemachine.States
             
             healingTarget = me.hurtComrades?[0];
             
-            UpdateAgent(me, 1f);
+            me.UpdateAgent(1f);
         }
-
-        private void UpdateAgent(StateManager manager, float stopingDistance)
-        {
-            manager.agent.updateRotation = !manager.agent.updateRotation;
-            manager.agent.updatePosition = !manager.agent.updatePosition;
-            manager.agent.stoppingDistance = stopingDistance;
-        }
-        
-        
 
         public override void OnStateUpdate(StateManager me)
         {
@@ -97,7 +88,7 @@ namespace Statemachine.States
         {
             me.agent.SetDestination(_lastPosition);
             me.onHealingRoute = false;
-            UpdateAgent(me, me.separationDistance);
+            me.UpdateAgent(me.separationDistance);
         }
     }
 }
