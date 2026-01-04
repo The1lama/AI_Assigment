@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Common.AI;
+using Enemy_AI;
+using Factory;
 
 namespace Common.Lab3_Steering_Swarm.Scripts.AI
 {
@@ -48,7 +50,7 @@ namespace Common.Lab3_Steering_Swarm.Scripts.AI
 
         private void Start()
         {
-            maxSpeed = GetComponent<AiBrain>().speed;
+            maxSpeed = GetComponent<CharacterFactory>().speed;
         }
         
         public void OnUpdateSeparation()
