@@ -64,6 +64,15 @@ namespace Statemachine.Friendly
         {
             aiBrain = GetComponent<CharacterFactory>();
             view = GetComponent<SensingView>();
+            agent = GetComponent<NavMeshAgent>();
+            
+            
+            #region Setup Walker
+            
+            walkerAgent = GetComponent<AiWalk>();
+            walkerAgent.stopingDistance = stopingDistance;
+
+            #endregion
 
             #region Set group
 
@@ -75,16 +84,6 @@ namespace Statemachine.Friendly
                     GetTheGroup();
 
             #endregion
-            
-            agent = GetComponent<NavMeshAgent>();
-            agent.stoppingDistance = stopingDistance;
-            agent.updateRotation = false;
-            agent.updatePosition = false;
-            agent.radius = stopingDistance/3;
-            
-            walkerAgent = GetComponent<AiWalk>();
-            walkerAgent.stopingDistance = stopingDistance;
-            
             
             SwitchState(stateList[(int)State.Follow]);
         }
@@ -173,12 +172,13 @@ namespace Statemachine.Friendly
 
         private void Update()
         {
-            if(lastAlive || CheckLeaderIsAlive()) return;
+            if(lastAlive || CheckLeaderIsAlive()) return;   // Returns if not is lastalive/ leader is alive
 
-            if (_group.Count > 1)
+            if (_group.Count > 1)   // 2 or more
             {
-                if (isMedi)
+                if (isMedi)     // searches for hurt comrades
                 {
+                    // gets a new leader thats not a medic
                     foreach (var comradeAlive in _group)
                     {
                         if (comradeAlive == gameObject ||comradeAlive == null) continue;
@@ -192,7 +192,7 @@ namespace Statemachine.Friendly
                         SwitchState(stateList[(int)State.Search]);
                 }
             }
-            else
+            else  // only one left
             {
                 lastAlive = true;
                 if(_currentState != stateList[(int)State.Search])
@@ -237,11 +237,6 @@ namespace Statemachine.Friendly
             {
                 _group.Add(memeber.gameObject);
             }
-        }
-
-        public void SetAgentDestination(Vector3 destination)
-        {
-            agent.SetDestination(destination);
         }
         
         public void RotateOffsetFromLeader()

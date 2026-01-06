@@ -124,12 +124,13 @@ namespace Statemachine.Enemy
 
         private void Update()
         {
-            if(lastAlive || CheckLeaderIsAlive()) return;
+            if(lastAlive || CheckLeaderIsAlive()) return;   // Returns if not is lastalive/ leader is alive
 
-            if (_group.Count > 1)
+            if (_group.Count > 1)   // 2 or more
             {
-                if (isMedi)
+                if (isMedi)     // searches for hurt comrades
                 {
+                    // gets a new leader thats not a medic
                     foreach (var comradeAlive in _group)
                     {
                         if (comradeAlive == gameObject ||comradeAlive == null) continue;
@@ -143,10 +144,10 @@ namespace Statemachine.Enemy
            //             SwitchState(stateList[(int)State.Search]);
            //     }
             }
-           // else
+           // else  // only one left
            // {
            //     lastAlive = true;
-           //     if(_currentEnemyState != stateList[(int)State.Search])
+           //     if(_currentState != stateList[(int)State.Search])
            //         SwitchState(stateList[(int)State.Search]);
            // }
         }
@@ -201,6 +202,5 @@ namespace Statemachine.Enemy
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
             transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
         }
-        
     }
 }

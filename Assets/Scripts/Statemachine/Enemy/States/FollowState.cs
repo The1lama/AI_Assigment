@@ -6,6 +6,7 @@ namespace Statemachine.Enemy.States
     {
         public override void OnStateEnter(EnemyStateManager me)
         {
+            me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
 
         public override void OnStateUpdate(EnemyStateManager me)
@@ -22,6 +23,7 @@ namespace Statemachine.Enemy.States
         
         public override void OnStateExit(EnemyStateManager me)
         {
+            me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
     }
 }
