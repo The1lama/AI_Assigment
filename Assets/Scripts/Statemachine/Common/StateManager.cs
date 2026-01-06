@@ -1,0 +1,172 @@
+using System.Collections.Generic;
+using System.Linq;
+using Common;
+using Common.AI;
+using Factory;
+using UnityEngine;
+using UnityEngine.AI;
+
+
+namespace Statemachine.Common
+{
+    interface IStates
+    {
+        public abstract StateMachineFactory currentState { get; set; }
+        public abstract StateMachineFactory[] stateList { get; set; }
+        public abstract StateMachineFactory lastState { get; set; }
+        
+    }
+    
+
+    public abstract class StateManager : MonoBehaviour, IStates
+    {
+        #region Variables
+
+            public abstract StateMachineFactory currentState { get; set; }
+            public abstract StateMachineFactory[] stateList { get; set; }
+            public abstract StateMachineFactory lastState { get; set; }
+            
+            public abstract float offsetAngle { get; set; }
+            public abstract Transform leader { get; set; }
+            public abstract List<GameObject> _group { get; set; }
+            public abstract float stopingDistance { get; set; }
+            public abstract LayerMask teamLayerMask { get; set; }
+            public abstract bool lastAlive { get; set; }
+
+            public abstract NavMeshAgent agent { get; set; }
+            public abstract AiWalk walkerAgent { get; set; }
+            public virtual CharacterFactory aiBrain { get; set; }
+
+            [Header("MediClass")] 
+            public abstract bool isMedi { get; set; }
+            public abstract float helpRadius  { get; set; }
+            public abstract bool onHealingRoute { get; set; }
+            public abstract List<GameObject> hurtComrades { get; set; }
+            
+            public Collider[] overLapResults =  new Collider[10];
+
+            public abstract SensingView view  { get; set; }
+
+        #endregion
+
+        public virtual void Awake()
+        {
+            aiBrain = GetComponent<CharacterFactory>();
+            view = GetComponent<SensingView>();
+            agent = GetComponent<NavMeshAgent>();
+
+            #region SetUp Walker
+
+            walkerAgent = GetComponent<AiWalk>();
+            walkerAgent.stopingDistance = stopingDistance;
+
+            #endregion
+
+            #region Setup group
+            
+                if (gameObject.CompareTag("Friendly"))
+                    _group = GameManager.Instance.friendlyEntities;
+                else if(gameObject.CompareTag("Enemy"))
+                    _group = GameManager.Instance.enemyEnteties;
+                else 
+                    GetTheGroup();
+
+            #endregion
+        }
+
+        public virtual void SwitchState(StateMachineFactory newState)
+        {
+            currentState?.OnStateExit(this);
+            lastState = currentState;
+            currentState = newState;
+            currentState?.OnStateEnter(this);
+        }
+
+        public void Update()
+        {
+            if(lastAlive || CheckLeaderIsAlive()) return;   // Returns if not is lastalive/ leader is alive
+
+            if (_group.Count > 1)   // 2 or more
+            {
+                if (isMedi)     // searches for hurt comrades
+                {
+                    // gets a new leader thats not a medic
+                    foreach (var comradeAlive in _group)
+                    {
+                        if (comradeAlive == gameObject ||comradeAlive == null) continue;
+                        leader =  comradeAlive.transform;
+                        break;
+                    }
+                }
+           //     else
+           //     {
+           //         if(_currentEnemyState != stateList[(int)State.Search])
+           //             SwitchState(stateList[(int)State.Search]);
+           //     }
+            }
+           // else  // only one left
+           // {
+           //     lastAlive = true;
+           //     if(_currentState != stateList[(int)State.Search])
+           //         SwitchState(stateList[(int)State.Search]);
+           // }
+        }
+
+        public bool CheckLeaderIsAlive()
+        {
+            return leader != null;
+        }
+
+        public virtual void FixedUpdate()
+        {
+            if (isMedi) IfMedic();
+            
+            currentState?.OnStateUpdate(this);
+        }
+
+        public abstract void IfMedic();
+        
+        public List<GameObject> FindHurtComrades()
+        {
+            hurtComrades.Clear();// not working right now
+            var size = Physics.OverlapSphereNonAlloc(transform.position, helpRadius, overLapResults, teamLayerMask);
+            for (int i = 0; i < size; i++)
+            {
+                var cHealth = overLapResults[i];
+                var cHealthComponent =  cHealth.GetComponent<CharacterFactory>();
+                if(cHealthComponent == null || !cHealthComponent.CompareTag(this.gameObject.tag)) continue;
+
+                if(cHealthComponent.needsHealth)
+                    hurtComrades.Add(cHealthComponent.gameObject);
+
+                // var cHealth = amountOfHurtComrades[i].GetComponent<CharacterFactory>();
+                // if (cHealth != null && cHealth.needsHealth && amountOfHurtComrades[i].CompareTag(this.gameObject.tag))
+                // {
+                //     hurtComrades.Add(cHealth.gameObject);
+                // }
+            }
+
+            return hurtComrades;
+        }
+
+        private void GetTheGroup()
+        {
+            foreach (var memeber in GameManager.Instance.allEntities.Where(m => m.gameObject.CompareTag(gameObject.tag)))
+            {
+                _group.Add(memeber.gameObject);
+            }
+        }
+        
+        public void RotateOffsetFromLeader()
+        {
+            var dotProd = Vector3.Dot(leader.transform.right, (transform.position - leader.transform.position).normalized);
+            var leftOrRight = 1;
+            
+            if(dotProd < 0 )
+                leftOrRight = -1;
+            
+            var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
+        }
+    }
+}

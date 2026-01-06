@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Statemachine.Friendly.States
+namespace Statemachine.Common.States
 {
     public class SearchState : StateMachineFactory
     {
 
         private float _range = 10.0f;
         
-        public override void OnStateEnter(FriendlyStateManager me)
+        public override void OnStateEnter(StateManager me)
         {
             Vector3 point;
             if (RandomPoint(me.transform.position, _range, out point, me))
@@ -17,7 +17,7 @@ namespace Statemachine.Friendly.States
             }
         }
 
-        public override void OnStateUpdate(FriendlyStateManager me)
+        public override void OnStateUpdate(StateManager me)
         {
             if (me.agent.remainingDistance <= me.stopingDistance + 1f)
             {
@@ -29,11 +29,11 @@ namespace Statemachine.Friendly.States
             }
         }
 
-        public override void OnStateExit(FriendlyStateManager me)
+        public override void OnStateExit(StateManager me)
         {
         }
         
-        private bool RandomPoint(Vector3 center, float range, out Vector3 result, FriendlyStateManager me)
+        private bool RandomPoint(Vector3 center, float range, out Vector3 result, StateManager me)
         {
             for (int i = 0; i < 30; i++)
             {

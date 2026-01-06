@@ -1,6 +1,6 @@
 namespace Statemachine.Friendly
 {
-    public abstract class StateMachineFactory
+    public abstract class FiendlyStateMachineFactory
     {
 
         public abstract void OnStateEnter(FriendlyStateManager me);

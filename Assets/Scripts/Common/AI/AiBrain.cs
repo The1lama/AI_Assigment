@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Factory;
-using Statemachine;
+using Statemachine.Common;
 using Statemachine.Friendly;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Serialization;
 using Weapon;
 
 namespace Common.AI
@@ -28,6 +24,17 @@ namespace Common.AI
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
+
+
+        private StateManager _stateManager;
+        [Header("Squad")]
+        public float offsetAngle = 30f;
+        public float stopingDistance = 3f;
+
+        [Header("Medic Class")] 
+        public bool isMedi = false;
+        public float helpRadius = 7f;
+        
         
         [Header("Debug")]
         [SerializeField]  private bool debug = true;
@@ -86,8 +93,23 @@ namespace Common.AI
             health = healthMax;
             
             InitializeView();
+
+            InitializeStateMachine();
+
+        }
+
+        private void InitializeStateMachine()
+        {
+            _stateManager = GetComponent<StateManager>();
             
+            _stateManager.leader = leader.transform;
             
+            _stateManager.offsetAngle = offsetAngle;
+            _stateManager.stopingDistance = stopingDistance;
+            
+            _stateManager.isMedi = isMedi;
+            _stateManager.helpRadius = helpRadius;
+
         }
 
         private void InitializeView()
@@ -104,12 +126,9 @@ namespace Common.AI
         
         private void Update()
         {
-            
             seesEnemy = TryFindEnemy();
             if (seesEnemy) return;
-
         }
-
 
         private bool TryFindEnemy()
         {

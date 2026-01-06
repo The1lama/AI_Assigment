@@ -1,17 +1,15 @@
 using UnityEngine;
 
-namespace Statemachine.Friendly.States
+namespace Statemachine.Common.States
 {
     public class FollowState : StateMachineFactory
     {
-
-        
-        public override void OnStateEnter(FriendlyStateManager me)
+        public override void OnStateEnter(StateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
 
-        public override void OnStateUpdate(FriendlyStateManager me)
+        public override void OnStateUpdate(StateManager me)
         {
 
             if (!me.agent.pathPending)
@@ -22,11 +20,9 @@ namespace Statemachine.Friendly.States
             me.RotateOffsetFromLeader();
         }
         
-        public override void OnStateExit(FriendlyStateManager me)
+        public override void OnStateExit(StateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
-
-        
     }
 }

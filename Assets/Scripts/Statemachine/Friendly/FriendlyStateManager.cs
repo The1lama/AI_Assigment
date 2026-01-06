@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using Common;
 using Common.AI;
-using Common.Lab3_Steering_Swarm.Scripts.AI;
-using Factory;
-using Statemachine.Friendly.States;
+using Statemachine.Common;
+using Statemachine.Common.States;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -12,7 +10,7 @@ using UnityEngine.InputSystem;
 namespace Statemachine.Friendly
 {
     
-    public class FriendlyStateManager : MonoBehaviour
+    public class FriendlyStateManager : StateManager
     {
         internal enum State
         {
@@ -22,35 +20,55 @@ namespace Statemachine.Friendly
             Medi,
         }
 
-        [Header("Squad")]
-        [field: SerializeField] public float offsetAngle { get; set; } = 30f;
-        public Transform leader;
-        public List<GameObject> _group;
-        public float stopingDistance = 3f;
-        public LayerMask teamLayerMask;
-        private bool lastAlive = false;
-        
-        internal NavMeshAgent agent;
-        //internal SteeringAgent steeringAgent;
-        internal AiWalk walkerAgent;
-        internal CharacterFactory aiBrain;
+        [Header("States")]
+        public override StateMachineFactory currentState { get; set; }
 
-        
-        [Header("MediClass")]
-        public bool isMedi = false;
-        public float helpRadius = 7f;
-        public bool onHealingRoute = false;
-        internal List<GameObject> hurtComrades = new List<GameObject>();
-
-        public StateMachineFactory[] stateList = new StateMachineFactory[] {
+        public override StateMachineFactory[] stateList { get; set; } = new StateMachineFactory[]
+        {
             new FollowState(),
             new HoldState(),
             new SearchState(),
             new MediState(),
         };
-        private StateMachineFactory _currentState;
-        internal StateMachineFactory lastState;
-        internal SensingView view;
+        public override StateMachineFactory lastState { get; set; }
+
+
+        [Header("Squad")]
+        [field: SerializeField] public override float offsetAngle { get; set; } = 30f;
+        public override Transform leader { get; set; }
+        public override List<GameObject> _group { get; set; }
+        [field:SerializeField] public override float stopingDistance { get; set; } = 3f;
+        public override LayerMask teamLayerMask { get; set; }
+        public override bool lastAlive { get; set; } = false;
+        
+        [Header("Movement & Senses")]
+        public override NavMeshAgent agent { get; set; }
+        public override AiWalk walkerAgent { get; set; }
+        public override SensingView view { get; set; }
+
+        [Header("Medic Class")]
+        [field:SerializeField] public override bool isMedi { get; set; }
+
+        [field:SerializeField] public override float helpRadius { get; set; } = 7f;
+        public override bool onHealingRoute { get; set; } = false;
+        public override List<GameObject> hurtComrades { get; set; } = new List<GameObject>();
+
+
+        public override void Awake()
+        {
+            base.Awake();
+            
+            SwitchState(stateList[(int)State.Follow]);
+        }
+
+
+        public override void IfMedic()
+        {
+            if(!onHealingRoute && FindHurtComrades().Count > 0)
+                SwitchState(stateList[(int)State.Medi]);
+        }
+        
+        
         
         
         [Header("Inputs")]
@@ -58,36 +76,6 @@ namespace Statemachine.Friendly
         private InputAction followAction;
         public InputAction mediAction { get; set; }
         private InputAction searchAction;
-
-        
-        public void Awake()
-        {
-            aiBrain = GetComponent<CharacterFactory>();
-            view = GetComponent<SensingView>();
-            agent = GetComponent<NavMeshAgent>();
-            
-            
-            #region Setup Walker
-            
-            walkerAgent = GetComponent<AiWalk>();
-            walkerAgent.stopingDistance = stopingDistance;
-
-            #endregion
-
-            #region Set group
-
-                if (gameObject.CompareTag("Friendly"))
-                    _group = GameManager.Instance.friendlyEntities;
-                else if(gameObject.CompareTag("Enemy"))
-                    _group = GameManager.Instance.enemyEnteties;
-                else 
-                    GetTheGroup();
-
-            #endregion
-            
-            SwitchState(stateList[(int)State.Follow]);
-        }
-
 
         #region KeyBinds
 
@@ -161,94 +149,5 @@ namespace Statemachine.Friendly
         #endregion
         
 
-        internal void SwitchState(StateMachineFactory newState)
-        {
-            _currentState?.OnStateExit(this);
-            lastState = _currentState;
-            _currentState = newState;
-            _currentState?.OnStateEnter(this);
-        }
-
-
-        private void Update()
-        {
-            if(lastAlive || CheckLeaderIsAlive()) return;   // Returns if not is lastalive/ leader is alive
-
-            if (_group.Count > 1)   // 2 or more
-            {
-                if (isMedi)     // searches for hurt comrades
-                {
-                    // gets a new leader thats not a medic
-                    foreach (var comradeAlive in _group)
-                    {
-                        if (comradeAlive == gameObject ||comradeAlive == null) continue;
-                        leader =  comradeAlive.transform;
-                        break;
-                    }
-                }
-                else
-                {
-                    if(_currentState != stateList[(int)State.Search])
-                        SwitchState(stateList[(int)State.Search]);
-                }
-            }
-            else  // only one left
-            {
-                lastAlive = true;
-                if(_currentState != stateList[(int)State.Search])
-                    SwitchState(stateList[(int)State.Search]);
-            }
-        }
-
-        private bool CheckLeaderIsAlive()
-        {
-            if (leader == null) return false;
-            
-            return true;
-        }
-        
-
-        private void FixedUpdate()
-        {
-            if(isMedi && !onHealingRoute && FindHurtComrades().Count > 0) SwitchState(stateList[(int)State.Medi]);
-            
-            _currentState?.OnStateUpdate(this);
-        }
-
-        private List<GameObject> FindHurtComrades()
-        {
-            hurtComrades.Clear();// not working right now
-            var amountOfHurtComrades = Physics.OverlapSphere(transform.position, helpRadius, teamLayerMask);
-            for (int i = 0; i < amountOfHurtComrades.Length; i++)
-            {
-                var cHealth = amountOfHurtComrades[i].GetComponent<CharacterFactory>();
-                if (cHealth != null && cHealth.needsHealth && amountOfHurtComrades[i].CompareTag(this.gameObject.tag))
-                {
-                    hurtComrades.Add(cHealth.gameObject);
-                }
-            }
-
-            return hurtComrades;
-        }
-
-        private void GetTheGroup()
-        {
-            foreach (var memeber in GameManager.Instance.allEntities.Where(m => m.gameObject.CompareTag(gameObject.tag)))
-            {
-                _group.Add(memeber.gameObject);
-            }
-        }
-        
-        public void RotateOffsetFromLeader()
-        {
-            var dotProd = Vector3.Dot(leader.transform.right, (transform.position - leader.transform.position).normalized);
-            var leftOrRight = 1;
-            
-            if(dotProd < 0 )
-                leftOrRight = -1;
-            
-            var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
-        }
     }
 }

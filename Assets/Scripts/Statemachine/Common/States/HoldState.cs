@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Statemachine.Friendly.States
+namespace Statemachine.Common.States
 {
     public class HoldState : StateMachineFactory
     {
@@ -18,7 +18,7 @@ namespace Statemachine.Friendly.States
         };
     
     
-        public override void OnStateEnter(FriendlyStateManager me)
+        public override void OnStateEnter(StateManager me)
         {
             currentPosition = me.transform;
             me.agent.SetDestination(currentPosition.position);
@@ -29,7 +29,7 @@ namespace Statemachine.Friendly.States
             currentRotationIndex = Random.Range(0, angles.Length);
         }
 
-        public override void OnStateUpdate(FriendlyStateManager me)
+        public override void OnStateUpdate(StateManager me)
         {
             //TODO: Make the agent look around
 
@@ -43,7 +43,7 @@ namespace Statemachine.Friendly.States
 
         }
 
-        public override void OnStateExit(FriendlyStateManager me)
+        public override void OnStateExit(StateManager me)
         {
             me.agent.stoppingDistance = me.stopingDistance;
             me.agent.autoBraking = true;

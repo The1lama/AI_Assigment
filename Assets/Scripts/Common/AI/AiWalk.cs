@@ -81,9 +81,8 @@ namespace Common.AI
         private void UpdateRotation()
         {
             var ds = (transform.rotation.eulerAngles - Quaternion.LookRotation(_agent.velocity).eulerAngles).magnitude;
-            Debug.Log(ds);
             
-            if ( ds < 0) return;
+            if ( ds <= 0) return;
             
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_agent.velocity), maxSpeed * Time.deltaTime);
         }

@@ -115,10 +115,10 @@ namespace Statemachine.Enemy
 
         internal void SwitchState(EnemyStateMachineFactory newEnemyState)
         {
-            _currentEnemyState.OnStateExit(this);
+            _currentEnemyState?.OnStateExit(this);
             lastState = _currentEnemyState;
             _currentEnemyState = newEnemyState;
-            _currentEnemyState.OnStateEnter(this);
+            _currentEnemyState?.OnStateEnter(this);
         }
 
 
