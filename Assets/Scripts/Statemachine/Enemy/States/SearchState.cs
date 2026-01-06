@@ -1,16 +1,14 @@
-using System.Collections;
-using Statemachine;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Statemachine.States
+namespace Statemachine.Enemy.States
 {
-    public class SearchState : StateMachineFactory
+    public class SearchState : EnemyStateMachineFactory
     {
 
         private float _range = 10.0f;
         
-        public override void OnStateEnter(StateManager me)
+        public override void OnStateEnter(EnemyStateManager me)
         {
             me.UpdateAgent(me.separationDistance);
             Vector3 point;
@@ -20,7 +18,7 @@ namespace Statemachine.States
             }
         }
 
-        public override void OnStateUpdate(StateManager me)
+        public override void OnStateUpdate(EnemyStateManager me)
         {
             if (me.agent.remainingDistance <= me.separationDistance + 1f)
             {
@@ -32,13 +30,13 @@ namespace Statemachine.States
             }
         }
 
-        public override void OnStateExit(StateManager me)
+        public override void OnStateExit(EnemyStateManager me)
         {
             Debug.Log("Exit");
             me.UpdateAgent(me.separationDistance);
         }
         
-        private bool RandomPoint(Vector3 center, float range, out Vector3 result, StateManager me)
+        private bool RandomPoint(Vector3 center, float range, out Vector3 result, EnemyStateManager me)
         {
             for (int i = 0; i < 30; i++)
             {

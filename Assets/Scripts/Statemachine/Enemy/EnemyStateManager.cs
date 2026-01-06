@@ -1,27 +1,26 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
-using Common.Interfaces;
 using Common.Lab3_Steering_Swarm.Scripts.AI;
 using Factory;
-using Statemachine.States;
+using Statemachine.Enemy.States;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
-namespace Statemachine
+namespace Statemachine.Enemy
 {
-    public enum State
-    {
-        Follow,
-        Hold,
-        Search,
-        Medi,
-    }
     
-    public class StateManager : MonoBehaviour
+    public class EnemyStateManager : MonoBehaviour
     {
+        internal enum State
+        {
+            Waypoint,
+            Follow,
+            Hold,
+            Search,
+            Medi,
+        }
 
         [Header("Squad")]
         [field: SerializeField] public float offsetAngle { get; set; } = 30f;
@@ -42,22 +41,20 @@ namespace Statemachine
         public bool onHealingRoute = false;
         internal List<GameObject> hurtComrades = new List<GameObject>();
 
-        public StateMachineFactory[] stateList = new StateMachineFactory[] {
+        public EnemyStateMachineFactory[] stateList = new EnemyStateMachineFactory[] {
+            new WaypointState(),
             new FollowState(),
             new HoldState(),
             new SearchState(),
             new MediState(),
         };
-        private StateMachineFactory _currentState;
-        internal StateMachineFactory lastState;
+        private EnemyStateMachineFactory _currentEnemyState;
+        internal EnemyStateMachineFactory lastState;
         internal SensingView view;
         
         
         [Header("Inputs")]
-        private InputAction holdAction;
-        private InputAction followAction;
-        public InputAction mediAction { get; set; }
-        private InputAction searchAction;
+        private InputAction waypointAction;
 
         
         public void Awake()
@@ -83,9 +80,17 @@ namespace Statemachine
             agent.radius = separationDistance/3;
             
             steeringAgent = GetComponent<SteeringAgent>();
+
+            if (stateList[(int)State.Waypoint] != null)
+            {
+                var wayState = stateList[(int)State.Waypoint];
+                
+            }
             
             
-            _currentState = stateList[(int)State.Follow];
+            
+            _currentEnemyState = stateList[(int)State.Waypoint];
+            _currentEnemyState.OnStateEnter(this);
         }
 
 
@@ -93,64 +98,25 @@ namespace Statemachine
 
             private void OnEnable()
             {
-                holdAction = new InputAction(
-                    name: "HoldAction",
-                    type: InputActionType.Button,
-                    binding: "<Keyboard>/h"
-                    );
-                holdAction.performed += HoldActionOnperformed;
-                holdAction.Enable();
-
-                followAction = new InputAction(
-                    name: "FollowAction",
-                    type: InputActionType.Button,
-                    binding: "<Keyboard>/f"
-                );
-                followAction.performed += FollowActionOnperformed;
-                followAction.Enable();
-                
-                
-                mediAction = new InputAction(
-                    name: "MediAction",
-                    type: InputActionType.Button,
-                    binding: "<Keyboard>/m"
-                );
-                mediAction.performed += mediActionOnperformed;
-                mediAction.Enable();
-
-                
-                searchAction = new InputAction(
+                waypointAction = new InputAction(
                     name: "SearchAction",
                     type: InputActionType.Button,
-                    binding: "<Keyboard>/o"
+                    binding: "<Keyboard>/l"
                 );
-                searchAction.performed += SearchActionOnperformed;
-                searchAction.Enable();
+                waypointAction.performed += WaypointActionOnperformed;
+                waypointAction.Enable();
             }
 
-            private void SearchActionOnperformed(InputAction.CallbackContext obj)
+            private void WaypointActionOnperformed(InputAction.CallbackContext obj)
             {
-                SwitchState(stateList[(int)State.Search]);
-            }
-
-            private void mediActionOnperformed(InputAction.CallbackContext obj)
-            {
-                if(isMedi) SwitchState(stateList[(int)State.Medi]);
+                SwitchState(stateList[(int)State.Waypoint]);
             }
 
 
             private void OnDisable()
             {
-                if(followAction != null){ followAction.performed -= FollowActionOnperformed; followAction.Disable();}
-                if(holdAction != null) {holdAction.performed -= HoldActionOnperformed; holdAction.Disable();}
-                if(mediAction != null) {mediAction.performed -= HoldActionOnperformed; mediAction.Disable();}
-                if(searchAction != null) {searchAction.performed -= HoldActionOnperformed; searchAction.Disable();}
+                if(waypointAction != null) {waypointAction.performed -= HoldActionOnperformed; waypointAction.Disable();}
 
-            }
-
-            private void FollowActionOnperformed(InputAction.CallbackContext obj)
-            {
-                SwitchState(stateList[(int)State.Follow]);
             }
 
             private void HoldActionOnperformed(InputAction.CallbackContext obj)
@@ -161,12 +127,12 @@ namespace Statemachine
         #endregion
         
 
-        internal void SwitchState(StateMachineFactory newState)
+        internal void SwitchState(EnemyStateMachineFactory newEnemyState)
         {
-            _currentState.OnStateExit(this);
-            lastState = _currentState;
-            _currentState = newState;
-            _currentState.OnStateEnter(this);
+            _currentEnemyState.OnStateExit(this);
+            lastState = _currentEnemyState;
+            _currentEnemyState = newEnemyState;
+            _currentEnemyState.OnStateEnter(this);
         }
 
 
@@ -187,14 +153,14 @@ namespace Statemachine
                 }
                 else
                 {
-                    if(_currentState != stateList[(int)State.Search])
+                    if(_currentEnemyState != stateList[(int)State.Search])
                         SwitchState(stateList[(int)State.Search]);
                 }
             }
             else
             {
                 lastAlive = true;
-                if(_currentState != stateList[(int)State.Search])
+                if(_currentEnemyState != stateList[(int)State.Search])
                     SwitchState(stateList[(int)State.Search]);
             }
         }
@@ -211,7 +177,7 @@ namespace Statemachine
         {
             if(isMedi && !onHealingRoute && FindHurtComrades().Count > 0) SwitchState(stateList[(int)State.Medi]);
             
-            _currentState?.OnStateUpdate(this);
+            _currentEnemyState?.OnStateUpdate(this);
         }
 
         private List<GameObject> FindHurtComrades()

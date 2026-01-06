@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Factory;
 using Statemachine;
+using Statemachine.Friendly;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;

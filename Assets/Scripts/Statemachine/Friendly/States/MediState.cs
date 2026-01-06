@@ -1,10 +1,7 @@
 using Factory;
-using Statemachine;
 using UnityEngine;
-using UnityEngine.AI;
 
-
-namespace Statemachine.States
+namespace Statemachine.Friendly.States
 {
     public class MediState : StateMachineFactory
     {

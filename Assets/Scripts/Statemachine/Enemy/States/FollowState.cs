@@ -1,17 +1,14 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Statemachine.States
+namespace Statemachine.Enemy.States
 {
-    public class FollowState : StateMachineFactory
+    public class FollowState : EnemyStateMachineFactory
     {
-
-        
-        public override void OnStateEnter(StateManager me)
+        public override void OnStateEnter(EnemyStateManager me)
         {
         }
 
-        public override void OnStateUpdate(StateManager me)
+        public override void OnStateUpdate(EnemyStateManager me)
         {
 
             if (!me.agent.pathPending)
@@ -25,14 +22,10 @@ namespace Statemachine.States
             me.RotateOffsetFromLeader();
             
             me.steeringAgent.OnUpdateSeparation();
-            
-            
         }
         
-        public override void OnStateExit(StateManager me)
+        public override void OnStateExit(EnemyStateManager me)
         {
         }
-
-        
     }
 }

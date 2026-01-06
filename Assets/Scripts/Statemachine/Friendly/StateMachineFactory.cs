@@ -1,7 +1,4 @@
-using UnityEngine;
-
-
-namespace Statemachine
+namespace Statemachine.Friendly
 {
     public abstract class StateMachineFactory
     {

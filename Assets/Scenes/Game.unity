@@ -480,7 +480,7 @@ GameObject:
   m_Component:
   - component: {fileID: 205506797}
   m_Layer: 0
-  m_Name: === WaypointParrent ===
+  m_Name: ===WaypointParrent===
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11565,6 +11565,7 @@ GameObject:
   - component: {fileID: 2065306596}
   - component: {fileID: 2065306595}
   - component: {fileID: 2065306594}
+  - component: {fileID: 2065306603}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -11755,7 +11756,7 @@ Transform:
   m_GameObject: {fileID: 2065306593}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.34, y: 1, z: -2.07}
+  m_LocalPosition: {x: 10.42, y: 1, z: -1.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11763,6 +11764,28 @@ Transform:
   - {fileID: 2113445482}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2065306603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065306593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fd3e257ed8c4ab4595d01416bcb2f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <offsetAngle>k__BackingField: 30
+  leader: {fileID: 0}
+  _group: []
+  separationDistance: 3
+  teamLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  isMedi: 0
+  helpRadius: 7
+  onHealingRoute: 0
 --- !u!1 &2085151360
 GameObject:
   m_ObjectHideFlags: 0
