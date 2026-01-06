@@ -10,30 +10,28 @@ namespace Statemachine.Enemy.States
         
         public override void OnStateEnter(EnemyStateManager me)
         {
-            me.UpdateAgent(me.separationDistance);
             Vector3 point;
             if (RandomPoint(me.transform.position, _range, out point, me))
             {
-                me.agent.SetDestination(point);
+                me.walkerAgent.SetDestination(point);
             }
         }
 
         public override void OnStateUpdate(EnemyStateManager me)
         {
-            if (me.agent.remainingDistance <= me.separationDistance + 1f)
+            if (me.agent.remainingDistance <= me.stopingDistance + 1f)
             {
                 Vector3 point;
                 if (RandomPoint(me.transform.position, _range, out point, me))
                 {
-                    me.agent.SetDestination(point);
+                    me.walkerAgent.SetDestination(point);
+                    //me.agent.SetDestination(point);
                 }
             }
         }
 
         public override void OnStateExit(EnemyStateManager me)
         {
-            Debug.Log("Exit");
-            me.UpdateAgent(me.separationDistance);
         }
         
         private bool RandomPoint(Vector3 center, float range, out Vector3 result, EnemyStateManager me)

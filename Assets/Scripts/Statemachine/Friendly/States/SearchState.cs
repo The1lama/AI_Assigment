@@ -10,7 +10,6 @@ namespace Statemachine.Friendly.States
         
         public override void OnStateEnter(StateManager me)
         {
-            me.UpdateAgent(me.separationDistance);
             Vector3 point;
             if (RandomPoint(me.transform.position, _range, out point, me))
             {
@@ -20,7 +19,7 @@ namespace Statemachine.Friendly.States
 
         public override void OnStateUpdate(StateManager me)
         {
-            if (me.agent.remainingDistance <= me.separationDistance + 1f)
+            if (me.agent.remainingDistance <= me.stopingDistance + 1f)
             {
                 Vector3 point;
                 if (RandomPoint(me.transform.position, _range, out point, me))
@@ -32,8 +31,6 @@ namespace Statemachine.Friendly.States
 
         public override void OnStateExit(StateManager me)
         {
-            Debug.Log("Exit");
-            me.UpdateAgent(me.separationDistance);
         }
         
         private bool RandomPoint(Vector3 center, float range, out Vector3 result, StateManager me)

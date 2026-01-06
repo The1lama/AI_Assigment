@@ -8,6 +8,7 @@ namespace Statemachine.Friendly.States
         
         public override void OnStateEnter(StateManager me)
         {
+            me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
 
         public override void OnStateUpdate(StateManager me)
@@ -15,21 +16,15 @@ namespace Statemachine.Friendly.States
 
             if (!me.agent.pathPending)
             {
-               me.SetAgentDestination(me.leader.position);
-                
+                me.walkerAgent.SetDestination(me.leader.position);
             }
 
-            me.transform.position = Vector3.MoveTowards(me.transform.position, me.agent.nextPosition, 5 * Time.deltaTime);
-                
             me.RotateOffsetFromLeader();
-            
-            me.steeringAgent.OnUpdateSeparation();
-            
-            
         }
         
         public override void OnStateExit(StateManager me)
         {
+            me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
 
         

@@ -45,7 +45,7 @@ namespace Statemachine.Friendly.States
 
         public override void OnStateExit(StateManager me)
         {
-            me.agent.stoppingDistance = me.separationDistance;
+            me.agent.stoppingDistance = me.stopingDistance;
             me.agent.autoBraking = true;
         }
     }

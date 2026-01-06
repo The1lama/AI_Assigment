@@ -20,7 +20,7 @@ namespace Statemachine.Friendly.States
             
             healingTarget = me.hurtComrades?[0];
             
-            me.UpdateAgent(1f);
+            me.walkerAgent.UpdateStopingAgent(1f);
         }
 
         public override void OnStateUpdate(StateManager me)
@@ -85,7 +85,7 @@ namespace Statemachine.Friendly.States
         {
             me.agent.SetDestination(_lastPosition);
             me.onHealingRoute = false;
-            me.UpdateAgent(me.separationDistance);
+            me.walkerAgent.UpdateStopingAgent(me.stopingDistance);
         }
     }
 }

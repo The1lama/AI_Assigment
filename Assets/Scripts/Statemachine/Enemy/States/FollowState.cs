@@ -13,15 +13,11 @@ namespace Statemachine.Enemy.States
 
             if (!me.agent.pathPending)
             {
-               me.SetAgentDestination(me.leader.position);
-                
+               me.walkerAgent.SetDestination(me.leader.position);
             }
 
-            me.transform.position = Vector3.MoveTowards(me.transform.position, me.agent.nextPosition, 5 * Time.deltaTime);
-                
             me.RotateOffsetFromLeader();
             
-            me.steeringAgent.OnUpdateSeparation();
         }
         
         public override void OnStateExit(EnemyStateManager me)

@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common;
-using Common.Lab3_Steering_Swarm.Scripts.AI;
+using Common.AI;
 using Factory;
 using Statemachine.Enemy.States;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace Statemachine.Enemy
 {
@@ -26,14 +27,13 @@ namespace Statemachine.Enemy
         [field: SerializeField] public float offsetAngle { get; set; } = 30f;
         public Transform leader;
         public List<GameObject> _group;
-        public float separationDistance = 3f;
+        public float stopingDistance = 3f;
         public LayerMask teamLayerMask;
         private bool lastAlive = false;
         
         internal NavMeshAgent agent;
-        internal SteeringAgent steeringAgent;
+        internal AiWalk walkerAgent;
         internal CharacterFactory aiBrain;
-
         
         [Header("MediClass")]
         public bool isMedi = false;
@@ -61,6 +61,15 @@ namespace Statemachine.Enemy
         {
             aiBrain = GetComponent<CharacterFactory>();
             view = GetComponent<SensingView>();
+            agent = GetComponent<NavMeshAgent>();
+            
+            
+            #region Setup Walker
+            
+            walkerAgent = GetComponent<AiWalk>();
+            walkerAgent.stopingDistance = stopingDistance;
+
+            #endregion
 
             #region Set group
 
@@ -73,26 +82,9 @@ namespace Statemachine.Enemy
 
             #endregion
             
-            agent = GetComponent<NavMeshAgent>();
-            agent.stoppingDistance = separationDistance;
-            agent.updateRotation = false;
-            agent.updatePosition = false;
-            agent.radius = separationDistance/3;
             
-            steeringAgent = GetComponent<SteeringAgent>();
-
-            if (stateList[(int)State.Waypoint] != null)
-            {
-                var wayState = stateList[(int)State.Waypoint];
-                
-            }
-            
-            
-            
-            _currentEnemyState = stateList[(int)State.Waypoint];
-            _currentEnemyState.OnStateEnter(this);
+            SwitchState(stateList[(int)State.Search]);
         }
-
 
         #region KeyBinds
 
@@ -115,17 +107,11 @@ namespace Statemachine.Enemy
 
             private void OnDisable()
             {
-                if(waypointAction != null) {waypointAction.performed -= HoldActionOnperformed; waypointAction.Disable();}
+                if(waypointAction != null) {waypointAction.performed -= WaypointActionOnperformed; waypointAction.Disable();}
 
-            }
-
-            private void HoldActionOnperformed(InputAction.CallbackContext obj)
-            {
-                SwitchState(stateList[(int)State.Hold]);
             }
             
         #endregion
-        
 
         internal void SwitchState(EnemyStateMachineFactory newEnemyState)
         {
@@ -151,18 +137,18 @@ namespace Statemachine.Enemy
                         break;
                     }
                 }
-                else
-                {
-                    if(_currentEnemyState != stateList[(int)State.Search])
-                        SwitchState(stateList[(int)State.Search]);
-                }
+           //     else
+           //     {
+           //         if(_currentEnemyState != stateList[(int)State.Search])
+           //             SwitchState(stateList[(int)State.Search]);
+           //     }
             }
-            else
-            {
-                lastAlive = true;
-                if(_currentEnemyState != stateList[(int)State.Search])
-                    SwitchState(stateList[(int)State.Search]);
-            }
+           // else
+           // {
+           //     lastAlive = true;
+           //     if(_currentEnemyState != stateList[(int)State.Search])
+           //         SwitchState(stateList[(int)State.Search]);
+           // }
         }
 
         private bool CheckLeaderIsAlive()
@@ -203,11 +189,6 @@ namespace Statemachine.Enemy
                 _group.Add(memeber.gameObject);
             }
         }
-
-        public void SetAgentDestination(Vector3 destination)
-        {
-            agent.SetDestination(destination);
-        }
         
         public void RotateOffsetFromLeader()
         {
@@ -220,16 +201,6 @@ namespace Statemachine.Enemy
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
             transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
         }
-        
-        
-        internal void UpdateAgent(float stopingDistance)
-        {
-            agent.updateRotation = !agent.updateRotation;
-            agent.updatePosition = !agent.updatePosition;
-            agent.stoppingDistance = stopingDistance;
-        }
-        
-        
         
     }
 }

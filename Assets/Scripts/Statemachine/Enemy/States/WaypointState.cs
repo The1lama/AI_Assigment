@@ -6,15 +6,15 @@ namespace Statemachine.Enemy.States
 {
     public class WaypointState : EnemyStateMachineFactory
     {
-        public List<Transform> waypointsList = new List<Transform>();
+        public List<GameObject> waypointsList = new List<GameObject>();
         private int waypointIndex = 0;
 
         private bool GetWaypoints()
         {
-            var wayState = GameObject.Find("===WaypointParrent===");
+            var wayState = GameObject.FindGameObjectsWithTag("Waypoint");
             if(wayState == null) return false;
             Debug.Log(wayState);
-            waypointsList = wayState.GetComponentsInChildren<Transform>().ToList();
+            waypointsList = wayState.ToList();
             return true;
         }
         
@@ -33,17 +33,18 @@ namespace Statemachine.Enemy.States
                 }
                 
             }
-            
+            Debug.Log(waypointsList.Count);
             waypointIndex = Random.Range(0, waypointsList.Count);
             NextWaypoint();
         }
 
         public override void OnStateUpdate(EnemyStateManager me)
         {
-            if (me.agent.remainingDistance <= me.separationDistance + 1f)
+            if (me.agent.remainingDistance <= me.stopingDistance + 1f)
             {
                 var indexPoint = NextWaypoint();
-                me.agent.SetDestination(waypointsList[indexPoint].position);
+                me.walkerAgent.SetDestination(waypointsList[indexPoint].transform.position);
+                //me.agent.SetDestination(waypointsList[indexPoint].transform.position);
             }
         }
 

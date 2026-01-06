@@ -20,7 +20,8 @@ namespace Statemachine.Enemy.States
             
             healingTarget = me.hurtComrades?[0];
             
-            me.UpdateAgent(1f);
+            //me.UpdateAgent(1f);
+            me.walkerAgent.UpdateStopingAgent(1f);
         }
 
         public override void OnStateUpdate(EnemyStateManager me)
@@ -48,7 +49,8 @@ namespace Statemachine.Enemy.States
                 if (MabyeSwitchHealingTarget(me)) return;
             }
 
-            me.agent.SetDestination(healingTarget.transform.position);
+            //me.agent.SetDestination(healingTarget.transform.position);
+            me.walkerAgent.SetDestination(healingTarget.transform.position);
             
             var distanceToComrade = Vector3.Distance(me.transform.position, healingTarget.transform.position);
             if (distanceToComrade < 2.5)
@@ -83,9 +85,11 @@ namespace Statemachine.Enemy.States
 
         public override void OnStateExit(EnemyStateManager me)
         {
-            me.agent.SetDestination(_lastPosition);
+            //me.agent.SetDestination(_lastPosition);
+            me.walkerAgent.SetDestination(_lastPosition);
             me.onHealingRoute = false;
-            me.UpdateAgent(me.separationDistance);
+            me.walkerAgent.UpdateStopingAgent(me.stopingDistance);
+            //me.UpdateAgent(me.separationDistance);
         }
     }
 }

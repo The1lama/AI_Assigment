@@ -43,7 +43,7 @@ namespace Statemachine.Enemy.States
 
         public override void OnStateExit(EnemyStateManager me)
         {
-            me.agent.stoppingDistance = me.separationDistance;
+            me.agent.stoppingDistance = me.stopingDistance;
             me.agent.autoBraking = true;
         }
     }

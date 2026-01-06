@@ -316,7 +316,7 @@ Transform:
   m_GameObject: {fileID: 113121449}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3241651, y: 0, z: 0, w: 0.9460005}
-  m_LocalPosition: {x: -7.6900005, y: 5.5, z: 7.6099997}
+  m_LocalPosition: {x: -27, y: 5.5, z: 30.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 160481944}
   m_Layer: 0
   m_Name: Waypoint (1)
-  m_TagString: Untagged
+  m_TagString: Waypoint
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -433,7 +433,7 @@ Transform:
   m_GameObject: {fileID: 160481943}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.82, y: 0, z: 4.55}
+  m_LocalPosition: {x: 8.25, y: 0, z: -7.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -450,7 +450,7 @@ GameObject:
   - component: {fileID: 176877388}
   m_Layer: 0
   m_Name: Waypoint (3)
-  m_TagString: Untagged
+  m_TagString: Waypoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -464,7 +464,7 @@ Transform:
   m_GameObject: {fileID: 176877387}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.45, y: 0, z: 9.71}
+  m_LocalPosition: {x: 28.88, y: 0, z: -1.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1132,7 +1132,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3241651, y: 0, z: 0, w: 0.9460005}
-  m_LocalPosition: {x: -7.6900005, y: 5.5, z: 7.6099997}
+  m_LocalPosition: {x: -27, y: 5.5, z: 30.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1779,7 +1779,7 @@ GameObject:
   - component: {fileID: 539756310}
   m_Layer: 0
   m_Name: Waypoint (2)
-  m_TagString: Untagged
+  m_TagString: Waypoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1793,7 +1793,7 @@ Transform:
   m_GameObject: {fileID: 539756309}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.11, y: 0, z: -9.48}
+  m_LocalPosition: {x: 10.9, y: 0, z: -15.37}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2378,7 +2378,7 @@ Transform:
   m_GameObject: {fileID: 674297772}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.6900005, y: 1, z: 12.809999}
+  m_LocalPosition: {x: -27, y: 1, z: 35.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2582,7 +2582,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &707820365
 Transform:
   m_ObjectHideFlags: 0
@@ -10535,7 +10535,7 @@ Transform:
   m_GameObject: {fileID: 1671582356}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.98, y: 1, z: 10.68}
+  m_LocalPosition: {x: -26.289999, y: 1, z: 33.370003}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10708,7 +10708,7 @@ MonoBehaviour:
   <offsetAngle>k__BackingField: 30
   leader: {fileID: 674297773}
   _group: []
-  separationDistance: 3
+  stopingDistance: 3
   teamLayerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -10724,20 +10724,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1671582356}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4493924c470306743b8e1fbed7782658, type: 3}
+  m_Script: {fileID: 11500000, guid: 8978d81a133ddcc4cbe1228435be0fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stopingDistance: 0
+  rotateGuy: 1
   maxForce: 10
-  separationRadius: 2
-  separationStrength: 2
-  cohesionRadius: 5
-  cohesionStrength: 0.17
-  alignmentRadius: 3
-  alignmentStrength: 2
+  separationRadius: 1.5
+  separationStrength: 5
   separationWeight: 1
-  cohesionWeight: 0.4
-  alignmentWeight: 1
-  avoidanceWeight: 1
   drawDebug: 1
 --- !u!1 &1677477706
 GameObject:
@@ -11019,7 +11014,7 @@ Transform:
   m_GameObject: {fileID: 1867904855}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.12, y: 1, z: 10.71}
+  m_LocalPosition: {x: -29.43, y: 1, z: 33.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11147,7 +11142,7 @@ MonoBehaviour:
   <offsetAngle>k__BackingField: 30
   leader: {fileID: 674297773}
   _group: []
-  separationDistance: 3
+  stopingDistance: 3
   teamLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -11209,20 +11204,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1867904855}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4493924c470306743b8e1fbed7782658, type: 3}
+  m_Script: {fileID: 11500000, guid: 8978d81a133ddcc4cbe1228435be0fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stopingDistance: 0
+  rotateGuy: 1
   maxForce: 10
-  separationRadius: 2
-  separationStrength: 2
-  cohesionRadius: 2
-  cohesionStrength: 0.17
-  alignmentRadius: 3
-  alignmentStrength: 2
+  separationRadius: 1.5
+  separationStrength: 5
   separationWeight: 1
-  cohesionWeight: 0.4
-  alignmentWeight: 1
-  avoidanceWeight: 1
   drawDebug: 1
 --- !u!1 &1891497580
 GameObject:
@@ -11566,6 +11556,7 @@ GameObject:
   - component: {fileID: 2065306595}
   - component: {fileID: 2065306594}
   - component: {fileID: 2065306603}
+  - component: {fileID: 2065306604}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -11779,13 +11770,32 @@ MonoBehaviour:
   <offsetAngle>k__BackingField: 30
   leader: {fileID: 0}
   _group: []
-  separationDistance: 3
+  stopingDistance: 3
   teamLayerMask:
     serializedVersion: 2
     m_Bits: 64
   isMedi: 0
   helpRadius: 7
   onHealingRoute: 0
+--- !u!114 &2065306604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065306593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8978d81a133ddcc4cbe1228435be0fcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stopingDistance: 0
+  rotateGuy: 1
+  maxForce: 10
+  separationRadius: 1.5
+  separationStrength: 5
+  separationWeight: 1
+  drawDebug: 1
 --- !u!1 &2085151360
 GameObject:
   m_ObjectHideFlags: 0

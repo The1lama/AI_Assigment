@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using Common.AI;
 using Common.Lab3_Steering_Swarm.Scripts.AI;
 using Factory;
 using Statemachine.Friendly.States;
@@ -10,7 +11,7 @@ using UnityEngine.InputSystem;
 
 namespace Statemachine.Friendly
 {
-    public enum State
+    internal enum State
     {
         Follow,
         Hold,
@@ -25,12 +26,13 @@ namespace Statemachine.Friendly
         [field: SerializeField] public float offsetAngle { get; set; } = 30f;
         public Transform leader;
         public List<GameObject> _group;
-        public float separationDistance = 3f;
+        public float stopingDistance = 3f;
         public LayerMask teamLayerMask;
         private bool lastAlive = false;
         
         internal NavMeshAgent agent;
-        internal SteeringAgent steeringAgent;
+        //internal SteeringAgent steeringAgent;
+        internal AiWalk walkerAgent;
         internal CharacterFactory aiBrain;
 
         
@@ -75,15 +77,16 @@ namespace Statemachine.Friendly
             #endregion
             
             agent = GetComponent<NavMeshAgent>();
-            agent.stoppingDistance = separationDistance;
+            agent.stoppingDistance = stopingDistance;
             agent.updateRotation = false;
             agent.updatePosition = false;
-            agent.radius = separationDistance/3;
+            agent.radius = stopingDistance/3;
             
-            steeringAgent = GetComponent<SteeringAgent>();
+            walkerAgent = GetComponent<AiWalk>();
+            walkerAgent.stopingDistance = stopingDistance;
             
             
-            _currentState = stateList[(int)State.Follow];
+            SwitchState(stateList[(int)State.Follow]);
         }
 
 
@@ -161,10 +164,10 @@ namespace Statemachine.Friendly
 
         internal void SwitchState(StateMachineFactory newState)
         {
-            _currentState.OnStateExit(this);
+            _currentState?.OnStateExit(this);
             lastState = _currentState;
             _currentState = newState;
-            _currentState.OnStateEnter(this);
+            _currentState?.OnStateEnter(this);
         }
 
 
@@ -252,16 +255,5 @@ namespace Statemachine.Friendly
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
             transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
         }
-        
-        
-        internal void UpdateAgent(float stopingDistance)
-        {
-            agent.updateRotation = !agent.updateRotation;
-            agent.updatePosition = !agent.updatePosition;
-            agent.stoppingDistance = stopingDistance;
-        }
-        
-        
-        
     }
 }

@@ -138,6 +138,8 @@ namespace Common.Lab3_Steering_Swarm.Scripts.AI
                 var otherMagnitude = toMe.magnitude;
 
 
+                // if distance to other guy is more than 0 and less than seperation radius 
+                // add to calculator
                 if (otherMagnitude > 0f && otherMagnitude < radius)
                 {
                     seprarationForce += toMe.normalized / otherMagnitude;
