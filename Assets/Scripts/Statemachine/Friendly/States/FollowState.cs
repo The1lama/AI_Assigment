@@ -6,12 +6,12 @@ namespace Statemachine.Friendly.States
     {
 
         
-        public override void OnStateEnter(StateManager me)
+        public override void OnStateEnter(FriendlyStateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }
 
-        public override void OnStateUpdate(StateManager me)
+        public override void OnStateUpdate(FriendlyStateManager me)
         {
 
             if (!me.agent.pathPending)
@@ -22,7 +22,7 @@ namespace Statemachine.Friendly.States
             me.RotateOffsetFromLeader();
         }
         
-        public override void OnStateExit(StateManager me)
+        public override void OnStateExit(FriendlyStateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
         }

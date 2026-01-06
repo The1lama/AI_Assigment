@@ -10,7 +10,7 @@ namespace Statemachine.Friendly.States
         private Vector3 _lastPosition;
         private bool isHealing;
         
-        public override void OnStateEnter(StateManager me)
+        public override void OnStateEnter(FriendlyStateManager me)
         {
             _lastPosition = me.transform.position;
             
@@ -23,7 +23,7 @@ namespace Statemachine.Friendly.States
             me.walkerAgent.UpdateStopingAgent(1f);
         }
 
-        public override void OnStateUpdate(StateManager me)
+        public override void OnStateUpdate(FriendlyStateManager me)
         {
             #region null and list checks
 
@@ -68,7 +68,7 @@ namespace Statemachine.Friendly.States
             }
         }
 
-        private bool MabyeSwitchHealingTarget(StateManager me)
+        private bool MabyeSwitchHealingTarget(FriendlyStateManager me)
         {
             if (me.hurtComrades.Count < 2)
             {
@@ -81,7 +81,7 @@ namespace Statemachine.Friendly.States
             return false;
         }
 
-        public override void OnStateExit(StateManager me)
+        public override void OnStateExit(FriendlyStateManager me)
         {
             me.agent.SetDestination(_lastPosition);
             me.onHealingRoute = false;

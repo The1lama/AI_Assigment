@@ -10,7 +10,7 @@ using Weapon;
 
 namespace Common.AI
 {
-    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(StateManager))]
+    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(FriendlyStateManager))]
     public class AiBrain : CharacterFactory
     {
         [Header("Setup guy")]

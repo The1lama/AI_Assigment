@@ -11,16 +11,16 @@ using UnityEngine.InputSystem;
 
 namespace Statemachine.Friendly
 {
-    internal enum State
-    {
-        Follow,
-        Hold,
-        Search,
-        Medi,
-    }
     
-    public class StateManager : MonoBehaviour
+    public class FriendlyStateManager : MonoBehaviour
     {
+        internal enum State
+        {
+            Follow,
+            Hold,
+            Search,
+            Medi,
+        }
 
         [Header("Squad")]
         [field: SerializeField] public float offsetAngle { get; set; } = 30f;
