@@ -1,14 +1,14 @@
 using Factory;
 using Statemachine.Common;
-using Statemachine.Friendly;
 using UnityEngine;
 using Weapon;
 
 namespace Common.AI
 {
-    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(FriendlyStateManager))]
+    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(AiWalk))]
     public class AiBrain : CharacterFactory
     {
+        
         [Header("Setup guy")]
         [SerializeField] private float _speed = 5;
         [field: SerializeField] public override float healthMax { get; set; } = 100f;
@@ -35,9 +35,8 @@ namespace Common.AI
         public bool isMedi = false;
         public float helpRadius = 7f;
         
-        
         [Header("Debug")]
-        [SerializeField]  private bool debug = true;
+        [SerializeField] private bool debug = true;
         [SerializeField] private bool isInRangeAndSeen;
 
 
@@ -73,7 +72,12 @@ namespace Common.AI
         #region override Stuff
 
         public override float health { get; set; }
-        public override float viewingDistance { get; set; }
+
+        public override float viewingDistance
+        {
+            get => setMaxViewingDistance; 
+            set => setMaxViewingDistance = value;
+        }
         public override LayerMask layerMask { get; set; }
 
         public override float speed
@@ -101,6 +105,12 @@ namespace Common.AI
         private void InitializeStateMachine()
         {
             _stateManager = GetComponent<StateManager>();
+
+            if (_stateManager == null)
+            {
+                Debug.LogWarning("State machine not found");
+                return;
+            }
             
             _stateManager.leader = leader.transform;
             
@@ -122,7 +132,7 @@ namespace Common.AI
             _view.fov = setFov;
             _view.obstructionLayerMask = obstacleLayerMask;
         }
-
+        
         
         private void Update()
         {

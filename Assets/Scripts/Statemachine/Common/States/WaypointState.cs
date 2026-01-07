@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Statemachine.Enemy;
 using UnityEngine;
 
-namespace Statemachine.Enemy.States
+namespace Statemachine.Common.States
 {
-    public class WaypointState : EnemyStateMachineFactory
+    public class WaypointState : StateMachineFactory
     {
         public List<GameObject> waypointsList = new List<GameObject>();
         private int waypointIndex = 0;
@@ -13,18 +14,16 @@ namespace Statemachine.Enemy.States
         {
             var wayState = GameObject.FindGameObjectsWithTag("Waypoint");
             if(wayState == null) return false;
-            Debug.Log(wayState);
+            
             waypointsList = wayState.ToList();
             return true;
         }
         
-        public override void OnStateEnter(EnemyStateManager me)
+        public override void OnStateEnter(StateManager me)
         {
             if (waypointsList.Count <= 0)
             {
                 var beel = GetWaypoints();
-                Debug.Log(beel);
-
                 if (!beel)
                 {
                     Debug.LogWarning("Waypoints not found");
@@ -33,18 +32,16 @@ namespace Statemachine.Enemy.States
                 }
                 
             }
-            Debug.Log(waypointsList.Count);
             waypointIndex = Random.Range(0, waypointsList.Count);
             NextWaypoint();
         }
 
-        public override void OnStateUpdate(EnemyStateManager me)
+        public override void OnStateUpdate(StateManager me)
         {
             if (me.agent.remainingDistance <= me.stopingDistance + 1f)
             {
                 var indexPoint = NextWaypoint();
                 me.walkerAgent.SetDestination(waypointsList[indexPoint].transform.position);
-                //me.agent.SetDestination(waypointsList[indexPoint].transform.position);
             }
         }
 
@@ -55,7 +52,7 @@ namespace Statemachine.Enemy.States
         }
         
 
-        public override void OnStateExit(EnemyStateManager me)
+        public override void OnStateExit(StateManager me)
         {
         }
     }

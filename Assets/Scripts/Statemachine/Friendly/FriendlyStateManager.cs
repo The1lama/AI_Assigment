@@ -12,6 +12,8 @@ namespace Statemachine.Friendly
     
     public class FriendlyStateManager : StateManager
     {
+
+        #region States
         internal enum State
         {
             Follow,
@@ -20,7 +22,6 @@ namespace Statemachine.Friendly
             Medi,
         }
 
-        [Header("States")]
         public override StateMachineFactory currentState { get; set; }
 
         public override StateMachineFactory[] stateList { get; set; } = new StateMachineFactory[]
@@ -31,53 +32,48 @@ namespace Statemachine.Friendly
             new MediState(),
         };
         public override StateMachineFactory lastState { get; set; }
+        
+        #endregion
 
+        #region Squad
 
-        [Header("Squad")]
         public override float offsetAngle { get; set; }
         public override Transform leader { get; set; }
         public override List<GameObject> _group { get; set; }
         public override float stopingDistance { get; set; }
         public override LayerMask teamLayerMask { get; set; }
         public override bool lastAlive { get; set; } = false;
-        
-        [Header("Movement & Senses")]
+
+        #endregion
+
+        #region Movements & Senses
+
         public override NavMeshAgent agent { get; set; }
         public override AiWalk walkerAgent { get; set; }
         public override SensingView view { get; set; }
 
-        [Header("Medic Class")]
+        #endregion
+
+        #region Medic Class
+
         public override bool isMedi { get; set; }
 
         public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; } = false;
         public override List<GameObject> hurtComrades { get; set; } = new List<GameObject>();
-
-
-        public override void Awake()
-        {
-            base.Awake();
-            
-            SwitchState(stateList[(int)State.Follow]);
-        }
-
-
         public override void IfMedic()
         {
             if(!onHealingRoute && FindHurtComrades().Count > 0)
                 SwitchState(stateList[(int)State.Medi]);
         }
-        
-        
-        
-        
-        [Header("Inputs")]
-        private InputAction holdAction;
-        private InputAction followAction;
-        public InputAction mediAction { get; set; }
-        private InputAction searchAction;
 
+        #endregion
+        
         #region KeyBinds
+            private InputAction holdAction;
+            private InputAction followAction;
+            private InputAction mediAction { get; set; }
+            private InputAction searchAction;
 
             private void OnEnable()
             {
@@ -147,6 +143,13 @@ namespace Statemachine.Friendly
             }
             
         #endregion
+        
+        public override void Awake()
+        {
+            base.Awake();
+            
+            SwitchState(stateList[(int)State.Follow]);
+        }
         
 
     }

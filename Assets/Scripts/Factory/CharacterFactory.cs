@@ -9,20 +9,20 @@ namespace Factory
 {
     public abstract class CharacterFactory : MonoBehaviour, IHealth
     {
-        public abstract float health { get; set; }
-        public virtual bool needsHealth { get; set; } = false;
         public abstract float viewingDistance { get; set; }
-        public abstract float healthMax { get; set; }
         public virtual float speed { get; set; }
         
         public abstract LayerMask layerMask { get; set; }
 
-        [Header("Healing")]
-        public bool canTakeHeal = true;
 
+        #region Healing & Damage
+        public abstract float healthMax { get; set; }
         
-        [Header("Damage")]
-        public bool canTakeDamage = true;
+        public abstract float health { get; set; }
+        public virtual bool needsHealth { get; set; } = false;
+        
+        [HideInInspector]public bool canTakeHeal = true;
+        [HideInInspector]public bool canTakeDamage = true;
 
         public virtual void TakeHeal(float healing)
         {
@@ -37,7 +37,6 @@ namespace Factory
 
             canTakeHeal = false;
             StartCoroutine(ResetHealCooldown());
-
         }
 
         private IEnumerator ResetHealCooldown()
@@ -62,6 +61,10 @@ namespace Factory
             yield return new WaitForSeconds(0.2f);
             canTakeDamage = true;
         }
+
+        #endregion
+        
+        
         
     }
 }

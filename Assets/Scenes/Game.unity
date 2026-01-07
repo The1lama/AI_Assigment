@@ -11561,12 +11561,11 @@ GameObject:
   - component: {fileID: 2065306600}
   - component: {fileID: 2065306599}
   - component: {fileID: 2065306598}
-  - component: {fileID: 2065306597}
-  - component: {fileID: 2065306596}
-  - component: {fileID: 2065306595}
-  - component: {fileID: 2065306594}
-  - component: {fileID: 2065306603}
+  - component: {fileID: 2065306607}
+  - component: {fileID: 2065306606}
   - component: {fileID: 2065306604}
+  - component: {fileID: 2065306605}
+  - component: {fileID: 2065306603}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -11574,82 +11573,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2065306594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065306593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4493924c470306743b8e1fbed7782658, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxForce: 10
-  separationRadius: 1.5
-  separationStrength: 5
-  cohesionRadius: 5
-  cohesionStrength: 0.17
-  alignmentRadius: 3
-  alignmentStrength: 2
-  separationWeight: 1
-  cohesionWeight: 0.4
-  alignmentWeight: 1
-  avoidanceWeight: 1
-  drawDebug: 1
---- !u!114 &2065306595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065306593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5576ac2136d163843997d09f7524520e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2065306596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065306593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d1c84eeef577f94ca6506c6d85f98c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2065306597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065306593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 092a150e6c2a00643b04ec533d72c98d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canTakeHeal: 1
-  canTakeDamage: 1
-  _speed: 5
-  <healthMax>k__BackingField: 100
-  shootDistance: 20
-  leader: {fileID: 0}
-  setMaxViewingDistance: 30
-  setFov: 170
-  targetLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  obstacleLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
-  debug: 1
-  isInRangeAndSeen: 0
 --- !u!136 &2065306598
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -11777,16 +11700,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd3e257ed8c4ab4595d01416bcb2f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <offsetAngle>k__BackingField: 30
-  leader: {fileID: 0}
-  _group: []
-  stopingDistance: 3
-  teamLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  isMedi: 0
-  helpRadius: 7
-  onHealingRoute: 0
+  overLapResults:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &2065306604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11806,6 +11730,62 @@ MonoBehaviour:
   separationStrength: 5
   separationWeight: 1
   drawDebug: 1
+--- !u!114 &2065306605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065306593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57b356a4f87ecc4c82d67feb30774a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canTakeHeal: 1
+  canTakeDamage: 1
+  _speed: 5
+  <healthMax>k__BackingField: 100
+  shootDistance: 20
+  leader: {fileID: 2065306593}
+  setMaxViewingDistance: 30
+  setFov: 170
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  offsetAngle: 30
+  stopingDistance: 3
+  isMedi: 0
+  helpRadius: 7
+  debug: 1
+  isInRangeAndSeen: 0
+--- !u!114 &2065306606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065306593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5576ac2136d163843997d09f7524520e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2065306607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065306593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d1c84eeef577f94ca6506c6d85f98c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2085151360
 GameObject:
   m_ObjectHideFlags: 0
