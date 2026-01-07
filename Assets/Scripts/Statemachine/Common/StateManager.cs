@@ -28,6 +28,8 @@ namespace Statemachine.Common
             public abstract StateMachineFactory[] stateList { get; set; }
             public abstract StateMachineFactory lastState { get; set; }
             
+            public abstract Vector3 lastKnownPosition { get; set; }
+            
             public abstract float offsetAngle { get; set; }
             public abstract Transform leader { get; set; }
             public abstract bool isLeader { get; set; }
@@ -38,7 +40,9 @@ namespace Statemachine.Common
 
             public abstract NavMeshAgent agent { get; set; }
             public abstract AiWalk walkerAgent { get; set; }
-            public virtual CharacterFactory aiBrain { get; set; }
+            public virtual AiBrain aiBrain { get; set; }
+            
+            public bool onTheHunt = false;
 
             [Header("MediClass")] 
             public abstract bool isMedi { get; set; }
@@ -54,7 +58,8 @@ namespace Statemachine.Common
 
         public virtual void Awake()
         {
-            aiBrain = GetComponent<CharacterFactory>();
+            aiBrain = GetComponent<AiBrain>();
+            
             view = GetComponent<SensingView>();
             agent = GetComponent<NavMeshAgent>();
 
@@ -89,8 +94,15 @@ namespace Statemachine.Common
 
             if(!lastAlive && !CheckLeaderIsAlive())
                 CheckToSwitchLeader();
-            
+
+
+            if (aiBrain.seesEnemy)
+            {
+                SwitchToHunt();
+            }
         }
+
+        public abstract void SwitchToHunt();
 
         public abstract void CheckToSwitchLeader();
         

@@ -21,6 +21,7 @@ namespace Statemachine.Enemy
             Hold,
             Search,
             Medi,
+            Hunt,
         }
 
         public override StateMachineFactory currentState { get; set; }
@@ -32,8 +33,11 @@ namespace Statemachine.Enemy
             new HoldState(),
             new SearchState(),
             new MediState(),
+            new HuntState(),
         };
         public override StateMachineFactory lastState { get; set; }
+        public override Vector3 lastKnownPosition { get; set; }
+        
 
         #endregion
 
@@ -66,33 +70,7 @@ namespace Statemachine.Enemy
         public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; }
         public override List<GameObject> hurtComrades { get; set; }
-        public override void CheckToSwitchLeader()
-        {
-            if (_group.Count > 1)   // 2 or more
-            {
-                Debug.Log("Switching to " + _group.Count + " leaders");
-                
-                // gets a new leader thats not a medic
-                foreach (var comradeAlive in _group)
-                {
-                    if (comradeAlive == null || comradeAlive.GetComponent<AiBrain>().isMedi) continue;
-                    if(comradeAlive != this.gameObject)
-                        leader = comradeAlive.transform;
-                    else
-                    {
-                        SwitchState(stateList[(int)State.Search]);
-                        isLeader = true;
-                    }
-                    break;
-                }
-            }
-            else
-            {
-                Debug.Log("LastAlive");
-                lastAlive = true;
-                SwitchState(stateList[(int)State.Search]);
-            }
-        }
+
 
         public override void IfMedic()
         {
@@ -136,5 +114,61 @@ namespace Statemachine.Enemy
             
             SwitchState(stateList[(int)State.Waypoint]);
         }
+        
+        
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (!onTheHunt && aiBrain.seesEnemy)
+            {
+                SwitchState(stateList[(int)State.Hunt]);
+            }
+            
+            
+            // add so it switches state between if has seen enenmy
+            // has lost line of sight 
+            // or attack 
+            // same with enemyState
+            
+            
+        }
+        
+        
+        
+        public override void SwitchToHunt()
+        {
+            SwitchState(stateList[(int)State.Hold]);
+        }
+        
+        public override void CheckToSwitchLeader()
+        {
+            if (_group.Count > 1)   // 2 or more
+            {
+                Debug.Log("Switching to " + _group.Count + " leaders");
+                
+                // gets a new leader thats not a medic
+                foreach (var comradeAlive in _group)
+                {
+                    if (comradeAlive == null || comradeAlive.GetComponent<AiBrain>().isMedi) continue;
+                    if(comradeAlive != this.gameObject)
+                        leader = comradeAlive.transform;
+                    else
+                    {
+                        SwitchState(stateList[(int)State.Search]);
+                        isLeader = true;
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                Debug.Log("LastAlive");
+                lastAlive = true;
+                SwitchState(stateList[(int)State.Search]);
+            }
+        }
+        
+        
     }
 }

@@ -12,7 +12,7 @@ namespace Common.AI
         [Header("Setup guy")]
         [SerializeField] private float _speed = 5;
         [field: SerializeField] public override float healthMax { get; set; } = 100f;
-        [SerializeField] private float shootDistance = 20f;
+        public float shootDistance = 20f;
         public GameObject leader;
         
         
@@ -20,6 +20,9 @@ namespace Common.AI
         [SerializeField] private float setMaxViewingDistance = 30f;
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
+        public bool seesEnemy = false;
+        public Vector3 enemyLastKnowPos;
+        public bool hasLos;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
@@ -66,7 +69,7 @@ namespace Common.AI
 
 
         private SensingView _view;
-        private AttackScript _weapon;
+        public AttackScript _weapon;
         
         #region override Stuff
 
@@ -138,35 +141,29 @@ namespace Common.AI
             TryFindEnemy();
         }
 
-        private bool TryFindEnemy()
+        private void TryFindEnemy()
         {
             var enemyHit = Physics.OverlapSphere(transform.position, viewingDistance, layerMask);
             foreach (var hit in enemyHit)
             {
                 if(!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS, out float distanceToTarget)) continue;
                 
-                // if guy to to far away to shoot it should walk closer to target and try again if guy sees target
-                if(distanceToTarget > shootDistance) break;
-                var toTarget = lastKnownPosition - transform.position;
-                var angle = AngleToTarget(toTarget);
-                
-                if (angle <= 0.99f ) 
-                    RotateObject(toTarget);
-                else
-                    _weapon.Shoot();
-                return true;
+                seesEnemy = true;
+                enemyLastKnowPos = lastKnownPosition;
+                hasLos = hasLOS;
             }
-            return false;
+            seesEnemy =  false;
+            hasLos = false;
         }
 
-        private void RotateObject(Vector3 targetPosition)
+        public void RotateObject(Vector3 targetPosition)
         {
             Vector3 direction = targetPosition.normalized;
             var rotation= Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 1f*Time.deltaTime);
         }
 
-        private float AngleToTarget(Vector3 targetPosition)
+        public float AngleToTarget(Vector3 targetPosition)
         {
             return Vector3.Dot(transform.forward, targetPosition.normalized);
         }
