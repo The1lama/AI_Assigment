@@ -20,7 +20,6 @@ namespace Common.AI
         [SerializeField] private float setMaxViewingDistance = 30f;
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
-        private bool seesEnemy = false;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
@@ -136,8 +135,7 @@ namespace Common.AI
         
         private void Update()
         {
-            seesEnemy = TryFindEnemy();
-            if (seesEnemy) return;
+            TryFindEnemy();
         }
 
         private bool TryFindEnemy()
@@ -152,8 +150,6 @@ namespace Common.AI
                 var toTarget = lastKnownPosition - transform.position;
                 var angle = AngleToTarget(toTarget);
                 
-                // rotate guy towards target within 10 degrees of it 
-                // then it can use weapon
                 if (angle <= 0.99f ) 
                     RotateObject(toTarget);
                 else
@@ -167,7 +163,7 @@ namespace Common.AI
         {
             Vector3 direction = targetPosition.normalized;
             var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 2f*Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 1f*Time.deltaTime);
         }
 
         private float AngleToTarget(Vector3 targetPosition)

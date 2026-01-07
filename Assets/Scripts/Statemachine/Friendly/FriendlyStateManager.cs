@@ -14,7 +14,7 @@ namespace Statemachine.Friendly
     {
 
         #region States
-        internal enum State
+        public enum State
         {
             Follow,
             Hold,
@@ -39,7 +39,8 @@ namespace Statemachine.Friendly
 
         public override float offsetAngle { get; set; }
         public override Transform leader { get; set; }
-        public override List<GameObject> _group { get; set; }
+        public override bool isLeader { get; set; } = false;
+        public override List<GameObject> _group { get; set; } = new List<GameObject>();
         public override float stopingDistance { get; set; }
         public override LayerMask teamLayerMask { get; set; }
         public override bool lastAlive { get; set; } = false;
@@ -61,6 +62,34 @@ namespace Statemachine.Friendly
         public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; } = false;
         public override List<GameObject> hurtComrades { get; set; } = new List<GameObject>();
+        public override void CheckToSwitchLeader()
+        {
+            if (_group.Count > 1)   // 2 or more
+            {
+                Debug.Log("Switching to " + _group.Count + " leaders");
+                
+                // gets a new leader thats not a medic
+                foreach (var comradeAlive in _group)
+                {
+                    if (comradeAlive == null || comradeAlive.GetComponent<AiBrain>().isMedi) continue;
+                    if(comradeAlive != this.gameObject)
+                        leader = comradeAlive.transform;
+                    else
+                    {
+                        SwitchState(stateList[(int)State.Search]);
+                        isLeader = true;
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                Debug.Log("LastAlive");
+                lastAlive = true;
+                SwitchState(stateList[(int)State.Search]);
+            }
+        }
+
         public override void IfMedic()
         {
             if(!onHealingRoute && FindHurtComrades().Count > 0)

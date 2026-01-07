@@ -7,48 +7,40 @@ namespace Statemachine.Common.States
 {
     public class WaypointState : StateMachineFactory
     {
-        public List<GameObject> waypointsList = new List<GameObject>();
+        private Transform[] waypointsList;
         private int waypointIndex = 0;
 
-        private bool GetWaypoints()
+        private bool GetWaypoints(StateManager me)
         {
-            var wayState = GameObject.FindGameObjectsWithTag("Waypoint");
-            if(wayState == null) return false;
+            var enemy = me as EnemyStateManager;
+            if (enemy == null || enemy.waypoints.Length <= 0) return false;
             
-            waypointsList = wayState.ToList();
+            waypointsList = enemy.waypoints;
             return true;
         }
         
         public override void OnStateEnter(StateManager me)
         {
-            if (waypointsList.Count <= 0)
+            if (!GetWaypoints(me)) 
             {
-                var beel = GetWaypoints();
-                if (!beel)
-                {
-                    Debug.LogWarning("Waypoints not found");
-                    me.SwitchState(me.lastState);
-                    return;
-                }
-                
+                Debug.LogWarning("Waypoints not found");
+                me.SwitchState(me.lastState);
+                return;
+            
             }
-            waypointIndex = Random.Range(0, waypointsList.Count);
+            waypointIndex = Random.Range(0, waypointsList.Length);
             NextWaypoint();
         }
 
         public override void OnStateUpdate(StateManager me)
         {
-            if (me.agent.remainingDistance <= me.stopingDistance + 1f)
-            {
-                var indexPoint = NextWaypoint();
-                me.walkerAgent.SetDestination(waypointsList[indexPoint].transform.position);
-            }
+            if (me.agent.remainingDistance <= me.stopingDistance)
+                me.walkerAgent.SetDestination(waypointsList[NextWaypoint()].transform.position);
         }
 
         private int NextWaypoint()
         {
-            waypointIndex = (waypointIndex + 1) % waypointsList.Count;
-            return waypointIndex;
+            return (waypointIndex += 1) % waypointsList.Length;
         }
         
 

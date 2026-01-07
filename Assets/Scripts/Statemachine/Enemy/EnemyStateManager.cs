@@ -14,7 +14,7 @@ namespace Statemachine.Enemy
 
         #region States
         
-        internal enum State
+        public enum State
         {
             Waypoint,
             Follow,
@@ -41,7 +41,8 @@ namespace Statemachine.Enemy
 
         public override float offsetAngle { get; set; }
         public override Transform leader { get; set; }
-        public override List<GameObject> _group { get; set; }
+        public override bool isLeader { get; set; } = false;
+        public override List<GameObject> _group { get; set; } = new List<GameObject>();
         public override float stopingDistance { get; set; }
         public override LayerMask teamLayerMask { get; set; }
         public override bool lastAlive { get; set; }
@@ -54,6 +55,9 @@ namespace Statemachine.Enemy
         public override AiWalk walkerAgent { get; set; }
         public override SensingView view { get; set; }
 
+        public Transform[] waypoints;
+        
+        
         #endregion
 
         #region Medic Class
@@ -62,6 +66,34 @@ namespace Statemachine.Enemy
         public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; }
         public override List<GameObject> hurtComrades { get; set; }
+        public override void CheckToSwitchLeader()
+        {
+            if (_group.Count > 1)   // 2 or more
+            {
+                Debug.Log("Switching to " + _group.Count + " leaders");
+                
+                // gets a new leader thats not a medic
+                foreach (var comradeAlive in _group)
+                {
+                    if (comradeAlive == null || comradeAlive.GetComponent<AiBrain>().isMedi) continue;
+                    if(comradeAlive != this.gameObject)
+                        leader = comradeAlive.transform;
+                    else
+                    {
+                        SwitchState(stateList[(int)State.Search]);
+                        isLeader = true;
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                Debug.Log("LastAlive");
+                lastAlive = true;
+                SwitchState(stateList[(int)State.Search]);
+            }
+        }
+
         public override void IfMedic()
         {
             if(!onHealingRoute && FindHurtComrades().Count > 0)

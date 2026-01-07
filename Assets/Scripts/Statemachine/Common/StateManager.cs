@@ -3,6 +3,8 @@ using System.Linq;
 using Common;
 using Common.AI;
 using Factory;
+using Statemachine.Enemy;
+using Statemachine.Friendly;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -28,7 +30,8 @@ namespace Statemachine.Common
             
             public abstract float offsetAngle { get; set; }
             public abstract Transform leader { get; set; }
-            public abstract List<GameObject> _group { get; set; }
+            public abstract bool isLeader { get; set; }
+            public abstract List<GameObject> _group { get; set; }  
             public abstract float stopingDistance { get; set; }
             public abstract LayerMask teamLayerMask { get; set; }
             public abstract bool lastAlive { get; set; }
@@ -62,16 +65,15 @@ namespace Statemachine.Common
 
             #endregion
 
-            #region Setup group
-            
-                if (gameObject.CompareTag("Friendly"))
-                    _group = GameManager.Instance.friendlyEntities;
-                else if(gameObject.CompareTag("Enemy"))
-                    _group = GameManager.Instance.enemyEnteties;
-                else 
-                    GetTheGroup();
-
+            #region SetUp group
+            if (gameObject.CompareTag("Friendly"))
+                _group = GameManager.Instance.friendlyEntities;
+            else if(gameObject.CompareTag("Enemy"))
+                _group = GameManager.Instance.enemyEnteties;
+            else 
+                GetTheGroup(); 
             #endregion
+            
         }
 
         public virtual void SwitchState(StateMachineFactory newState)
@@ -84,36 +86,20 @@ namespace Statemachine.Common
 
         public void Update()
         {
-            if(lastAlive || CheckLeaderIsAlive()) return;   // Returns if not is lastalive/ leader is alive
 
-            if (_group.Count > 1)   // 2 or more
-            {
-                if (isMedi)     // searches for hurt comrades
-                {
-                    // gets a new leader thats not a medic
-                    foreach (var comradeAlive in _group)
-                    {
-                        if (comradeAlive == gameObject ||comradeAlive == null) continue;
-                        leader =  comradeAlive.transform;
-                        break;
-                    }
-                }
-           //     else
-           //     {
-           //         if(_currentEnemyState != stateList[(int)State.Search])
-           //             SwitchState(stateList[(int)State.Search]);
-           //     }
-            }
-           // else  // only one left
-           // {
-           //     lastAlive = true;
-           //     if(_currentState != stateList[(int)State.Search])
-           //         SwitchState(stateList[(int)State.Search]);
-           // }
+            if(!lastAlive && !CheckLeaderIsAlive())
+                CheckToSwitchLeader();
+            
         }
 
-        public bool CheckLeaderIsAlive()
+        public abstract void CheckToSwitchLeader();
+        
+        
+
+        private bool CheckLeaderIsAlive()
         {
+            if(isLeader)
+                return true;
             return leader != null;
         }
 
@@ -138,12 +124,6 @@ namespace Statemachine.Common
 
                 if(cHealthComponent.needsHealth)
                     hurtComrades.Add(cHealthComponent.gameObject);
-
-                // var cHealth = amountOfHurtComrades[i].GetComponent<CharacterFactory>();
-                // if (cHealth != null && cHealth.needsHealth && amountOfHurtComrades[i].CompareTag(this.gameObject.tag))
-                // {
-                //     hurtComrades.Add(cHealth.gameObject);
-                // }
             }
 
             return hurtComrades;
@@ -153,7 +133,9 @@ namespace Statemachine.Common
         {
             foreach (var memeber in GameManager.Instance.allEntities.Where(m => m.gameObject.CompareTag(gameObject.tag)))
             {
-                _group.Add(memeber.gameObject);
+                var distanceTo = (memeber.transform.position - transform.position).magnitude;
+                if(distanceTo < 10f)
+                    _group.Add(memeber.gameObject);
             }
         }
         
