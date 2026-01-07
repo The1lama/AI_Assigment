@@ -14,7 +14,9 @@ namespace Statemachine.Enemy.States
             if (RandomPoint(me.transform.position, _range, out point, me))
             {
                 me.walkerAgent.SetDestination(point);
+                return;
             }
+            OnStateEnter(me);
         }
 
         public override void OnStateUpdate(EnemyStateManager me)

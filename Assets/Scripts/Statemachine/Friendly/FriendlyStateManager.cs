@@ -34,10 +34,10 @@ namespace Statemachine.Friendly
 
 
         [Header("Squad")]
-        [field: SerializeField] public override float offsetAngle { get; set; } = 30f;
+        public override float offsetAngle { get; set; }
         public override Transform leader { get; set; }
         public override List<GameObject> _group { get; set; }
-        [field:SerializeField] public override float stopingDistance { get; set; } = 3f;
+        public override float stopingDistance { get; set; }
         public override LayerMask teamLayerMask { get; set; }
         public override bool lastAlive { get; set; } = false;
         
@@ -47,9 +47,9 @@ namespace Statemachine.Friendly
         public override SensingView view { get; set; }
 
         [Header("Medic Class")]
-        [field:SerializeField] public override bool isMedi { get; set; }
+        public override bool isMedi { get; set; }
 
-        [field:SerializeField] public override float helpRadius { get; set; } = 7f;
+        public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; } = false;
         public override List<GameObject> hurtComrades { get; set; } = new List<GameObject>();
 

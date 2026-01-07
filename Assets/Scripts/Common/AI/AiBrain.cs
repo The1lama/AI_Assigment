@@ -144,7 +144,7 @@ namespace Common.AI
                 
                 // rotate guy towards target within 10 degrees of it 
                 // then it can use weapon
-                if (angle <= 0.95f ) 
+                if (angle <= 0.99f ) 
                     RotateObject(toTarget);
                 else
                     _weapon.Shoot();
@@ -157,7 +157,7 @@ namespace Common.AI
         {
             Vector3 direction = targetPosition.normalized;
             var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 2f*Time.deltaTime);
         }
 
         private float AngleToTarget(Vector3 targetPosition)

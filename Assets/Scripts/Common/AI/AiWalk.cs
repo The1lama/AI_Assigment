@@ -11,6 +11,7 @@ namespace Common.AI
     public class AiWalk : MonoBehaviour
     {
         private NavMeshAgent _agent;
+        private AiBrain _aiBrain;
         private float maxSpeed;
         [HideInInspector] public float stopingDistance;
 
@@ -60,6 +61,7 @@ namespace Common.AI
             _agent.stoppingDistance = stopingDistance;
             _agent.updateRotation = false;
             _agent.updatePosition = false;
+            _agent.autoRepath = true;
             _agent.radius = separationRadius;
         }
 
@@ -67,10 +69,10 @@ namespace Common.AI
         {
             if (_agent == null) return;
             
+            OnUpdateSeparation();
             if(_agent.remainingDistance >= 0f)
                 transform.position = Vector3.MoveTowards(transform.position, _agent.nextPosition, maxSpeed * Time.deltaTime);
             
-            OnUpdateSeparation();
 
             if (rotateGuy)
             {
@@ -80,11 +82,12 @@ namespace Common.AI
 
         private void UpdateRotation()
         {
-            var ds = (transform.rotation.eulerAngles - Quaternion.LookRotation(_agent.velocity).eulerAngles).magnitude;
+            var steeringVelocity = GetSteering();
+            if (steeringVelocity.magnitude < 0.001f) return;
+            var targetRot = Quaternion.LookRotation(steeringVelocity, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, maxSpeed * Time.deltaTime);
             
-            if ( ds <= 0) return;
-            
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_agent.velocity), maxSpeed * Time.deltaTime);
+            //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_agent.transform.forward), maxSpeed * Time.deltaTime);
         }
 
         public void SetDestination(Vector3 destination)
@@ -98,13 +101,14 @@ namespace Common.AI
         private void OnUpdateSeparation()
         {
             Vector3 steering = Vector3.zero;
+
+
+            //if (!(_agent.remainingDistance <= _agent.stoppingDistance))
+              //  steering += GetPathStreeing();
             
             
-            if (allAgents.Count > 1)
-            {
-                steering += Separation(separationRadius, separationStrength) *  separationWeight;
+            steering += Separation(separationRadius, separationStrength) *  separationWeight;
                 
-            }
 
             if (steering == Vector3.zero) return;
             
@@ -117,10 +121,12 @@ namespace Common.AI
             // Velocity Change = Acceleration * Time.
             _velocity += steering * Time.deltaTime;
             _velocity = Vector3.ClampMagnitude(_velocity, maxForce);
-            _velocity.y = 0;
+            _velocity.y = 0f;
             
             // Move Agent
             transform.position += _velocity * Time.deltaTime;
+            ConstrainToNavMesh();
+            _agent.nextPosition = transform.position;
         }
         
         private Vector3 Separation(float radius, float strength)    // Avoid distance from group
@@ -161,6 +167,23 @@ namespace Common.AI
         {
             _agent.stoppingDistance = stopingDistance;
         }
+
+        private Vector3 GetSteering()
+        {
+            if(!_agent.hasPath || _agent.path.corners.Length < 2) return Vector3.zero;
+            
+            var target = _agent.path.corners[1];
+            var desirecVelocity = (target - transform.position).normalized;
+            
+            return desirecVelocity;
+        }
+
+        private void ConstrainToNavMesh()
+        {
+            if(NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 0.5f, NavMesh.AllAreas))
+                transform.position = hit.position;
+        }
+        
         
         private void OnDrawGizmos()
         {
