@@ -7,8 +7,6 @@ namespace Statemachine.Common.States
         private Transform currentPosition;
 
         private Quaternion startRotation;
-        private bool isDone = false;
-        float offestAngle = 90f;
         private int currentRotationIndex = 0;
 
         private float[] angles = new float[]

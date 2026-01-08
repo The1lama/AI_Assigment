@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Common;
 using Common.AI;
 using Statemachine.Common;
+using Statemachine.Common.State;
 using Statemachine.Common.States;
 using UnityEngine;
 using UnityEngine.AI;
@@ -22,9 +23,16 @@ namespace Statemachine.Enemy
             Search,
             Medi,
             Hunt,
+            LastKnowPos,
         }
 
-        public override StateMachineFactory currentState { get; set; }
+        public State startState = new State();
+
+        public override StateMachineFactory defaultState { 
+            get => stateList[(int)startState]; 
+            set => stateList[(int)startState] = value; 
+        }
+        [field:SerializeField]public override StateMachineFactory currentState { get; set; }
 
         public override StateMachineFactory[] stateList { get; set; } = new StateMachineFactory[]
         {
@@ -34,6 +42,7 @@ namespace Statemachine.Enemy
             new SearchState(),
             new MediState(),
             new HuntState(),
+            new LastKnownPosState(),
         };
         public override StateMachineFactory lastState { get; set; }
         public override Vector3 lastKnownPosition { get; set; }
@@ -119,12 +128,6 @@ namespace Statemachine.Enemy
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-
-            if (!onTheHunt && aiBrain.seesEnemy)
-            {
-                SwitchState(stateList[(int)State.Hunt]);
-            }
-            
             
             // add so it switches state between if has seen enenmy
             // has lost line of sight 
@@ -138,9 +141,14 @@ namespace Statemachine.Enemy
         
         public override void SwitchToHunt()
         {
-            SwitchState(stateList[(int)State.Hold]);
+            SwitchState(stateList[(int)State.Hunt]);
         }
-        
+
+        public override void SwitchToLastKnownPosition()
+        {
+            SwitchState(stateList[(int)State.LastKnowPos]);
+        }
+
         public override void CheckToSwitchLeader()
         {
             if (_group.Count > 1)   // 2 or more

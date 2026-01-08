@@ -17,7 +17,14 @@ namespace Statemachine.Common.States
                 me.walkerAgent.SetDestination(me.leader.position);
             }
 
-            me.RotateOffsetFromLeader();
+            if(!me.aiBrain.seesEnemy)
+                me.RotateOffsetFromLeader();
+            else
+            {
+                Debug.Log("Sees Enemy: and Rotating");
+                var ds = me.aiBrain.enemyLastKnowPos;
+                me.aiBrain.SetVectorRotateTarget(ds);
+            }
         }
         
         public override void OnStateExit(StateManager me)

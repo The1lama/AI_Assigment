@@ -22,6 +22,12 @@ namespace Statemachine.Friendly
             Medi,
         }
 
+        public State startState = new State();
+        
+        public override StateMachineFactory defaultState { 
+            get => stateList[(int)startState]; 
+            set => stateList[(int)startState] = value; 
+        }
         public override StateMachineFactory currentState { get; set; }
 
         public override StateMachineFactory[] stateList { get; set; } = new StateMachineFactory[]
@@ -170,6 +176,10 @@ namespace Statemachine.Friendly
         
 
         public override void SwitchToHunt()
+        {
+        }
+
+        public override void SwitchToLastKnownPosition()
         {
             throw new System.NotImplementedException();
         }

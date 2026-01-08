@@ -14,6 +14,8 @@ namespace Factory
         
         public abstract LayerMask layerMask { get; set; }
 
+        private Quaternion _rotateGoal;
+
 
         #region Healing & Damage
         public abstract float healthMax { get; set; }
@@ -63,8 +65,46 @@ namespace Factory
         }
 
         #endregion
+
+
+        public virtual void Update()
+        {
+            if(_rotateGoal != transform.rotation)
+                RotateTowards();
+        }
+        
+        
+        private void RotateTowards()
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, _rotateGoal, speed*Time.deltaTime);
+        }
+
+        /// <summary>
+        /// Set a rotation goal 
+        /// </summary>
+        /// <param name="targetPosition">the targets Vector3</param>
+        public void SetVectorRotateTarget(Vector3 targetPosition)
+        {
+            Vector3 directionToTarget = targetPosition - transform.position;
+            _rotateGoal = Quaternion.LookRotation(directionToTarget.normalized, Vector3.up);
+        }
+
+        public void SetQuaternionRotation(Quaternion rotation)
+        {
+            _rotateGoal = rotation;
+        }
         
         
         
+        /// <summary>
+        /// Retuns an angle from original pos to target
+        /// </summary>
+        /// <param name="orginPos">Send in forward</param>
+        /// <param name="targetPosition">Send in a normalized</param>
+        /// <returns>Angle towards target</returns>
+        public float AngleToTarget(Vector3 orginPos, Vector3 targetPosition)
+        {
+            return Vector3.Dot(orginPos, targetPosition);
+        }
     }
 }

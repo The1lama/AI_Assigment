@@ -80,22 +80,24 @@ namespace Common.AI
             }
         }
 
+        
+        
+        
         private void UpdateRotation()
         {
             var steeringVelocity = GetSteering();
             if (steeringVelocity.magnitude < 0.001f) return;
             var targetRot = Quaternion.LookRotation(steeringVelocity, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, maxSpeed * Time.deltaTime);
-            
-            //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_agent.transform.forward), maxSpeed * Time.deltaTime);
         }
 
-        public void SetDestination(Vector3 destination)
+        public void SetDestination(Vector3 destination, bool ignore = false)
         {
-            if (!_agent.pathPending)
+            if (!_agent.pathPending || ignore)
             {
+                Debug.Log("Destination: " + destination);
                 _agent.SetDestination(destination);
-            }
+            } else Debug.Log("Could not set destination: " + destination);
         }
         
         private void OnUpdateSeparation()
@@ -168,6 +170,10 @@ namespace Common.AI
             _agent.stoppingDistance = stopingDistance;
         }
 
+        /// <summary>
+        /// Get the sering direction
+        /// </summary>
+        /// <returns>Normalized Vector3</returns>
         private Vector3 GetSteering()
         {
             if(!_agent.hasPath || _agent.path.corners.Length < 2) return Vector3.zero;

@@ -55,21 +55,20 @@ namespace Common.AI
 
         private void OnDisable()
         {
-            if (GameManager.Instance == null) return; 
-            
-            GameManager.Instance.allEntities.Remove(gameObject);
-            
-            if(gameObject.CompareTag("Friendly"))
-                GameManager.Instance.friendlyEntities.Remove(this.gameObject);
-            else if(gameObject.CompareTag("Enemy"))
-                GameManager.Instance.enemyEnteties.Remove(this.gameObject);
-            
-            
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.allEntities.Remove(gameObject);
+                
+                if(gameObject.CompareTag("Friendly"))
+                    GameManager.Instance.friendlyEntities.Remove(this.gameObject);
+                else if(gameObject.CompareTag("Enemy"))
+                    GameManager.Instance.enemyEnteties.Remove(this.gameObject);
+            }
         }
 
 
         private SensingView _view;
-        public AttackScript _weapon;
+        [HideInInspector] public AttackScript _weapon;
         
         #region override Stuff
 
@@ -134,11 +133,14 @@ namespace Common.AI
             _view.fov = setFov;
             _view.obstructionLayerMask = obstacleLayerMask;
         }
-        
-        
-        private void Update()
+
+
+        public override void Update()
         {
+            base.Update();
+            
             TryFindEnemy();
+            
         }
 
         private void TryFindEnemy()
@@ -146,26 +148,20 @@ namespace Common.AI
             var enemyHit = Physics.OverlapSphere(transform.position, viewingDistance, layerMask);
             foreach (var hit in enemyHit)
             {
-                if(!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS, out float distanceToTarget)) continue;
-                
+                if (!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS,
+                        out float distanceToTarget))
+                {
+                    seesEnemy = false;
+                    hasLos = hasLOS;
+                    continue;
+                }
+                if(CompareTag("Enemy"))
+                    Debug.Log($"<Color=red>TryAndSee Sucsessfull: {hit.name}</Color>");
                 seesEnemy = true;
                 enemyLastKnowPos = lastKnownPosition;
                 hasLos = hasLOS;
+                break;
             }
-            seesEnemy =  false;
-            hasLos = false;
-        }
-
-        public void RotateObject(Vector3 targetPosition)
-        {
-            Vector3 direction = targetPosition.normalized;
-            var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 1f*Time.deltaTime);
-        }
-
-        public float AngleToTarget(Vector3 targetPosition)
-        {
-            return Vector3.Dot(transform.forward, targetPosition.normalized);
         }
 
         private void OnDrawGizmosSelected()

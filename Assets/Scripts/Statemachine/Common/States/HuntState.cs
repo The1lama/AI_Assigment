@@ -24,9 +24,14 @@ public class HuntState : StateMachineFactory
         targetPos = brain.enemyLastKnowPos;
         hasLos = brain.hasLos;
         
-        // if guy to to far away to shoot it should walk closer to target and try again if guy sees target
+        // if guy to far away to shoot it should walk closer to target and try again if guy sees target
         var toTarget = (me.transform.position - targetPos).magnitude;
 
+        if (!hasLos)
+        {
+            me.SwitchToLastKnownPosition();
+        }
+        
         if (toTarget > shootDistance)
         {
             me.walkerAgent.SetDestination(targetPos);
@@ -37,19 +42,24 @@ public class HuntState : StateMachineFactory
             me.agent.ResetPath();
         }
         
-        
             
-            
-        var angle = brain.AngleToTarget(targetPos);
-        if (angle <= 0.99f ) 
-            brain.RotateObject(targetPos);
+        var angle = brain.AngleToTarget(brain._weapon.transform.forward, targetPos.normalized);
+        if (angle <= 0.98f)
+        {
+            brain.SetVectorRotateTarget(targetPos);
+        }
         else
+        {
             brain._weapon.Shoot();
+            Debug.Log("Shoooot");
+        }
     }
 
     public override void OnStateExit(StateManager me)
     {
         Debug.Log("Exited HuntState");
+        Debug.Log($"<Color=red>TryAndSee Sucsessfull: {targetPos}</Color>");
+        me.lastKnownPosition = targetPos;
         me.onTheHunt = false;
     }
 }

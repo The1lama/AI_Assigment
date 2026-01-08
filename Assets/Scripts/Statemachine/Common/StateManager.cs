@@ -23,7 +23,8 @@ namespace Statemachine.Common
     public abstract class StateManager : MonoBehaviour, IStates
     {
         #region Variables
-
+            public abstract StateMachineFactory defaultState { get; set; }
+        
             public abstract StateMachineFactory currentState { get; set; }
             public abstract StateMachineFactory[] stateList { get; set; }
             public abstract StateMachineFactory lastState { get; set; }
@@ -96,13 +97,15 @@ namespace Statemachine.Common
                 CheckToSwitchLeader();
 
 
-            if (aiBrain.seesEnemy)
+            if (!onTheHunt && aiBrain.seesEnemy)
             {
                 SwitchToHunt();
             }
         }
 
         public abstract void SwitchToHunt();
+        
+        public abstract void SwitchToLastKnownPosition();
 
         public abstract void CheckToSwitchLeader();
         
@@ -160,7 +163,7 @@ namespace Statemachine.Common
                 leftOrRight = -1;
             
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, offsetLook, Time.deltaTime *3f);
+            aiBrain.SetQuaternionRotation(offsetLook);
         }
     }
 }
