@@ -12,7 +12,6 @@ public class HuntState : StateMachineFactory
     
     public override void OnStateEnter(StateManager me)
     {
-        Debug.Log("Entered HuntState");
         brain = me.aiBrain;
         shootDistance = brain.shootDistance;
 
@@ -45,8 +44,6 @@ public class HuntState : StateMachineFactory
 
     public override void OnStateExit(StateManager me)
     {
-        Debug.Log("Exited HuntState");
-        Debug.Log($"<Color=red>TryAndSee Sucsessfull: {targetPos}</Color>");
         me.lastKnownPosition = targetPos;
         me.onTheHunt = false;
     }

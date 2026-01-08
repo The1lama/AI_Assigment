@@ -8,11 +8,14 @@ namespace Statemachine.Common.States
 
         private Quaternion startRotation;
         private int currentRotationIndex = 0;
+        private float _phaseTimer;
 
         private float[] angles = new float[]
         {
             90f,
+            270f,
             -90f,
+            23f,
         };
     
     
@@ -21,6 +24,9 @@ namespace Statemachine.Common.States
             currentPosition = me.transform;
             me.walkerAgent.SetDestination(currentPosition.position);
             me.agent.stoppingDistance = 0f;
+            
+            _phaseTimer = 0f;
+            me.aiBrain.rotateOverride = !me.aiBrain.rotateOverride;
 
             startRotation = me.transform.rotation;
             currentRotationIndex = Random.Range(0, angles.Length);
@@ -28,14 +34,16 @@ namespace Statemachine.Common.States
 
         public override void OnStateUpdate(StateManager me)
         {
-
-            var targetRotation = startRotation * Quaternion.Euler(0f, angles[currentRotationIndex], 0f);
-            me.transform.rotation = Quaternion.Slerp(me.agent.transform.rotation, targetRotation, 1.5f*Time.deltaTime);
-
-
-            if (targetRotation != me.transform.rotation) return; // does not work with 180 degrees but works with 90 
-            startRotation = me.transform.rotation;
-            currentRotationIndex = ( currentRotationIndex += 1 ) % angles.Length; 
+             _phaseTimer -= Time.deltaTime;
+            if (_phaseTimer <= 0f)
+            {
+                _phaseTimer = 2f;
+                
+                var leftLook = me.transform.rotation * Quaternion.Euler(0f, angles[currentRotationIndex], 0f);
+                me.aiBrain.SetQuaternionRotation(leftLook);
+                
+                currentRotationIndex = ( currentRotationIndex += 1 ) % angles.Length; 
+            }
 
         }
 

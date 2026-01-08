@@ -56,7 +56,6 @@ namespace Statemachine.Common.States
                         case false:
                             result = hit.position;
                             return true;
-                            break;
                     }
                     
                 }

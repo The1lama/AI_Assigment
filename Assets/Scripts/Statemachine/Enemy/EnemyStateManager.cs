@@ -47,7 +47,6 @@ namespace Statemachine.Enemy
         public override StateMachineFactory lastState { get; set; }
         public override Vector3 lastKnownPosition { get; set; }
         
-
         #endregion
 
         #region Squad
@@ -59,7 +58,7 @@ namespace Statemachine.Enemy
         public override float stopingDistance { get; set; }
         public override LayerMask teamLayerMask { get; set; }
         public override bool lastAlive { get; set; }
-
+        
         #endregion
 
         #region Movements & Senses
@@ -92,6 +91,7 @@ namespace Statemachine.Enemy
         #region KeyBinds
         
         private InputAction waypointAction;
+        private InputAction searchAction;
         
         private void OnEnable()
         {
@@ -102,6 +102,22 @@ namespace Statemachine.Enemy
             );
             waypointAction.performed += WaypointActionOnperformed;
             waypointAction.Enable();
+            
+            
+            searchAction = new InputAction(
+                name: "SearchAction",
+                type: InputActionType.Button,
+                binding: "<Keyboard>/k"
+            );
+            searchAction.performed += searchActionOnperformed;
+            searchAction.Enable();
+            
+            
+        }
+
+        private void searchActionOnperformed(InputAction.CallbackContext obj)
+        {
+            SwitchState(stateList[(int)State.Search]);
         }
 
         private void WaypointActionOnperformed(InputAction.CallbackContext obj)
@@ -112,6 +128,7 @@ namespace Statemachine.Enemy
         private void OnDisable()
         {
             if(waypointAction != null) {waypointAction.performed -= WaypointActionOnperformed; waypointAction.Disable();}
+            if(searchAction != null) {searchAction.performed -= searchActionOnperformed; searchAction.Disable();}
         }
             
         #endregion
@@ -123,21 +140,6 @@ namespace Statemachine.Enemy
             
             SwitchState(stateList[(int)State.Waypoint]);
         }
-        
-        
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            
-            // add so it switches state between if has seen enenmy
-            // has lost line of sight 
-            // or attack 
-            // same with enemyState
-            
-            
-        }
-        
-        
         
         public override void SwitchToHunt()
         {
@@ -153,8 +155,6 @@ namespace Statemachine.Enemy
         {
             if (_group.Count > 1)   // 2 or more
             {
-                Debug.Log("Switching to " + _group.Count + " leaders");
-                
                 // gets a new leader thats not a medic
                 foreach (var comradeAlive in _group)
                 {
@@ -171,7 +171,6 @@ namespace Statemachine.Enemy
             }
             else
             {
-                Debug.Log("LastAlive");
                 lastAlive = true;
                 SwitchState(stateList[(int)State.Search]);
             }

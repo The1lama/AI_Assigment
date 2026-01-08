@@ -52,8 +52,6 @@ namespace Statemachine.Common
             public abstract bool onHealingRoute { get; set; }
             public abstract List<GameObject> hurtComrades { get; set; }
             
-            public Collider[] overLapResults =  new Collider[10];
-
             public abstract SensingView view  { get; set; }
 
         #endregion
@@ -109,8 +107,6 @@ namespace Statemachine.Common
         public abstract void SwitchToLastKnownPosition();
 
         public abstract void CheckToSwitchLeader();
-        
-        
 
         private bool CheckLeaderIsAlive()
         {
@@ -127,7 +123,6 @@ namespace Statemachine.Common
             
             ShootTowardEnemy();
         }
-        
         
         private void ShootTowardEnemy()
         {
@@ -147,9 +142,6 @@ namespace Statemachine.Common
                 aiBrain._weapon.Shoot();
             }
         }
-
-        
-        
 
         public abstract void IfMedic();
         

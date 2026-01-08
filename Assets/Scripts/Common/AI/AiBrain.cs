@@ -20,9 +20,9 @@ namespace Common.AI
         [SerializeField] private float setMaxViewingDistance = 30f;
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
-        public bool seesEnemy = false;
-        public GameObject enemyLastKnowPos;
-        public bool hasLos;
+        internal bool seesEnemy = false;
+        internal GameObject enemyLastKnowPos;
+        internal bool hasLos;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
@@ -40,8 +40,9 @@ namespace Common.AI
         
         [Header("Debug")]
         [SerializeField] private bool debug = true;
-        [SerializeField] private bool isInRangeAndSeen;
 
+        private SensingView _view;
+        [HideInInspector] public AttackScript _weapon;
 
         private void OnEnable()
         {
@@ -68,8 +69,6 @@ namespace Common.AI
         }
 
 
-        private SensingView _view;
-        [HideInInspector] public AttackScript _weapon;
         
         #region override Stuff
 
@@ -170,9 +169,6 @@ namespace Common.AI
         {
             if (debug)
             {
-                Gizmos.color = isInRangeAndSeen ? Color.green : Color.red;
-                Gizmos.DrawWireSphere(transform.position, viewingDistance);
-                
                 Vector3 rightBoundary = Quaternion.Euler(0, setFov * 0.5f, 0) * transform.forward;
                 Vector3 leftBoundary = Quaternion.Euler(0, -setFov * 0.5f, 0) * transform.forward;
 

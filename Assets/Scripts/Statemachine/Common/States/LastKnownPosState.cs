@@ -1,7 +1,5 @@
-using System.Collections;
 using Common.AI;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Statemachine.Common.State
 {
@@ -11,9 +9,6 @@ namespace Statemachine.Common.State
         private AiBrain brain;
         private float shootDistance;
         private Vector3 targetPos;
-        private int newTries;
-        private bool validPath;
-
 
         private enum SearchPhase
         {
@@ -30,7 +25,6 @@ namespace Statemachine.Common.State
         public override void OnStateEnter(StateManager me)
         {
             brain = me.aiBrain;
-            newTries = 0;
             
             
             targetPos = me.lastKnownPosition;

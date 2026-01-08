@@ -170,38 +170,24 @@ namespace Statemachine.Friendly
             
             SwitchState(stateList[(int)State.Follow]);
         }
-        
-        
-        
-
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            
-            // add so it switches state between if has seen enenmy
-            // has lost line of sight 
-            // or attack 
-            // same with enemyState
-            
-        }
-
-
-        
 
         public override void SwitchToHunt()
         {
+            if (lastAlive || currentState == stateList[(int)State.Search])
+            {
+                SwitchState(stateList[(int)State.Hunt]);
+            }
         }
 
         public override void SwitchToLastKnownPosition()
         {
-        }
+            SwitchState(stateList[(int)State.LastKnowPos]);
+        }   
 
         public override void CheckToSwitchLeader()
         {
             if (_group.Count > 1)   // 2 or more
             {
-                Debug.Log("Switching to " + _group.Count + " leaders");
-                
                 // gets a new leader thats not a medic
                 foreach (var comradeAlive in _group)
                 {
@@ -218,7 +204,6 @@ namespace Statemachine.Friendly
             }
             else
             {
-                Debug.Log("LastAlive");
                 lastAlive = true;
                 SwitchState(stateList[(int)State.Search]);
             }

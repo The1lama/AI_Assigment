@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using Factory;
-using Statemachine.Common;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 
