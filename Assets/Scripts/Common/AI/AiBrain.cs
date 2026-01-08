@@ -1,22 +1,18 @@
-using System;
-using System.Collections.Generic;
 using Factory;
-using Statemachine;
-using Statemachine.Friendly;
+using Statemachine.Common;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Serialization;
 using Weapon;
 
 namespace Common.AI
 {
-    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(FriendlyStateManager))]
+    [RequireComponent(typeof(SensingView), typeof(AttackScript), typeof(AiWalk))]
     public class AiBrain : CharacterFactory
     {
+        
         [Header("Setup guy")]
         [SerializeField] private float _speed = 5;
         [field: SerializeField] public override float healthMax { get; set; } = 100f;
-        [SerializeField] private float shootDistance = 20f;
+        public float shootDistance = 20f;
         public GameObject leader;
         
         
@@ -24,15 +20,29 @@ namespace Common.AI
         [SerializeField] private float setMaxViewingDistance = 30f;
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
-        private bool seesEnemy = false;
+        internal bool seesEnemy = false;
+        internal GameObject enemyLastKnowPos;
+        internal bool hasLos;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
+
+        internal bool rotateOverride = false;
+
+        private StateManager _stateManager;
+        [Header("Squad")]
+        public float offsetAngle = 30f;
+        public float stopingDistance = 3f;
+
+        [Header("Medic Class")] 
+        public bool isMedi = false;
+        public float helpRadius = 7f;
         
         [Header("Debug")]
-        [SerializeField]  private bool debug = true;
-        [SerializeField] private bool isInRangeAndSeen;
+        [SerializeField] private bool debug = true;
 
+        private SensingView _view;
+        [HideInInspector] public AttackScript _weapon;
 
         private void OnEnable()
         {
@@ -47,26 +57,28 @@ namespace Common.AI
 
         private void OnDisable()
         {
-            if (GameManager.Instance == null) return; 
-            
-            GameManager.Instance.allEntities.Remove(gameObject);
-            
-            if(gameObject.CompareTag("Friendly"))
-                GameManager.Instance.friendlyEntities.Remove(this.gameObject);
-            else if(gameObject.CompareTag("Enemy"))
-                GameManager.Instance.enemyEnteties.Remove(this.gameObject);
-            
-            
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.allEntities.Remove(gameObject);
+                
+                if(gameObject.CompareTag("Friendly"))
+                    GameManager.Instance.friendlyEntities.Remove(this.gameObject);
+                else if(gameObject.CompareTag("Enemy"))
+                    GameManager.Instance.enemyEnteties.Remove(this.gameObject);
+            }
         }
 
 
-        private SensingView _view;
-        private AttackScript _weapon;
         
         #region override Stuff
 
         public override float health { get; set; }
-        public override float viewingDistance { get; set; }
+
+        public override float viewingDistance
+        {
+            get => setMaxViewingDistance; 
+            set => setMaxViewingDistance = value;
+        }
         public override LayerMask layerMask { get; set; }
 
         public override float speed
@@ -86,8 +98,29 @@ namespace Common.AI
             health = healthMax;
             
             InitializeView();
+
+            InitializeStateMachine();
+
+        }
+
+        private void InitializeStateMachine()
+        {
+            _stateManager = GetComponent<StateManager>();
+
+            if (_stateManager == null)
+            {
+                Debug.LogWarning("State machine not found");
+                return;
+            }
             
+            _stateManager.leader = leader.transform;
             
+            _stateManager.offsetAngle = offsetAngle;
+            _stateManager.stopingDistance = stopingDistance;
+            
+            _stateManager.isMedi = isMedi;
+            _stateManager.helpRadius = helpRadius;
+
         }
 
         private void InitializeView()
@@ -101,58 +134,41 @@ namespace Common.AI
             _view.obstructionLayerMask = obstacleLayerMask;
         }
 
-        
-        private void Update()
-        {
-            
-            seesEnemy = TryFindEnemy();
-            if (seesEnemy) return;
 
+        public override void Update()
+        {
+            base.Update();
+            
+            TryFindEnemy();
+            
+            if(rotateOverride)
+                RotateTowards();
+            
         }
 
-
-        private bool TryFindEnemy()
+        private void TryFindEnemy()
         {
             var enemyHit = Physics.OverlapSphere(transform.position, viewingDistance, layerMask);
             foreach (var hit in enemyHit)
             {
-                if(!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS, out float distanceToTarget)) continue;
-                
-                // if guy to to far away to shoot it should walk closer to target and try again if guy sees target
-                if(distanceToTarget > shootDistance) break;
-                var toTarget = lastKnownPosition - transform.position;
-                var angle = AngleToTarget(toTarget);
-                
-                // rotate guy towards target within 10 degrees of it 
-                // then it can use weapon
-                if (angle <= 0.95f ) 
-                    RotateObject(toTarget);
-                else
-                    _weapon.Shoot();
-                return true;
+                if (!_view.TrySeeTarget(hit.transform, out Vector3 lastKnownPosition, out bool hasLOS,
+                        out float distanceToTarget))
+                {
+                    seesEnemy = false;
+                    hasLos = hasLOS;
+                    continue;
+                }
+                seesEnemy = true;
+                enemyLastKnowPos = hit.gameObject;
+                hasLos = hasLOS;
+                break;
             }
-            return false;
-        }
-
-        private void RotateObject(Vector3 targetPosition)
-        {
-            Vector3 direction = targetPosition.normalized;
-            var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
-        }
-
-        private float AngleToTarget(Vector3 targetPosition)
-        {
-            return Vector3.Dot(transform.forward, targetPosition.normalized);
         }
 
         private void OnDrawGizmosSelected()
         {
             if (debug)
             {
-                Gizmos.color = isInRangeAndSeen ? Color.green : Color.red;
-                Gizmos.DrawWireSphere(transform.position, viewingDistance);
-                
                 Vector3 rightBoundary = Quaternion.Euler(0, setFov * 0.5f, 0) * transform.forward;
                 Vector3 leftBoundary = Quaternion.Euler(0, -setFov * 0.5f, 0) * transform.forward;
 

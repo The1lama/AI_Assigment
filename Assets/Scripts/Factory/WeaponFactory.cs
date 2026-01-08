@@ -37,10 +37,9 @@ namespace Factory
         /// <param name="rotation">What rotation should it have</param>
         protected virtual void BulletSpawn(GameObject bulletPrefab, Vector3 position, Quaternion rotation)
         {
-            //TODO: Add bullet force and Instantiate that shit
             
-            //GameObject bullet = Instantiate(bulletPrefab, position, rotation);
-            
+            GameObject bullet = Instantiate(bulletPrefab, position, rotation);
+            bullet.tag = tag;
             Debug.DrawRay(position, position, Color.red, 0.5f);
             
             

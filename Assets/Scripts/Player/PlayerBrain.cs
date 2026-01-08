@@ -66,15 +66,19 @@ namespace Player
 
         private void OnDisable()
         {
-            if (GameManager.Instance == null) return;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.allEntities.Remove(gameObject);
+                GameManager.Instance.friendlyEntities.Remove(gameObject);
+            }
             
-            GameManager.Instance.allEntities.Remove(gameObject);
-            GameManager.Instance.friendlyEntities.Remove(gameObject);
         }
 
 
-        private void Update()
+        public override void Update()
         {
+            base.Update();
+            
             TryFindEnemy();
         }
 
@@ -91,40 +95,16 @@ namespace Player
                 // if guy to to far away to shoot it should walk closer to target and try again if guy sees target
                 if(distanceToTarget > shootDistance) break;
                 var toTarget = lastKnownPosition - transform.position;
-                var angle = AngleToTarget(toTarget);
-                
+                var angle = AngleToTarget(_weapon.transform.forward, toTarget.normalized);
                 // rotate guy towards target within 10 degrees of it 
                 // then it can use weapon
-                if (angle <= 0.95f ) 
-                    RotateObject(toTarget);
+                if (angle <= 0.98f ) 
+                    SetVectorRotateTarget(lastKnownPosition);
                 else
                     _weapon.Shoot();
             }
         }
 
-        private void RotateObject(Vector3 targetPosition)
-        {
-            Vector3 direction = targetPosition.normalized*3;
-            var rotation= Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f*Time.deltaTime);
-        }
-
-        private float AngleToTarget(Vector3 targetPosition)
-        {
-            return Vector3.Dot(transform.forward, targetPosition.normalized);
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
     }
