@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Factory;
+using Statemachine.Common;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -43,6 +44,7 @@ namespace Common.AI
         private void Awake()
         {
             allAgents = GameManager.Instance.allEntities;
+            _aiBrain = GetComponent<AiBrain>();
             maxSpeed = GetComponent<CharacterFactory>().speed;
             
             InitializeAgent();
@@ -62,26 +64,45 @@ namespace Common.AI
             _agent.updateRotation = false;
             _agent.updatePosition = false;
             _agent.autoRepath = true;
-            _agent.radius = separationRadius;
         }
 
         private void Update()
         {
             if (_agent == null) return;
             
-            OnUpdateSeparation();
+            if(!_aiBrain.seperationOverride)
+                OnUpdateSeparation();
+            
             if(_agent.remainingDistance >= 0f)
                 transform.position = Vector3.MoveTowards(transform.position, _agent.nextPosition, maxSpeed * Time.deltaTime);
             
 
             if (rotateGuy)
             {
-                UpdateRotation();
+                //UpdateRotation();
+                dnaso();
             }
         }
 
-        
-        
+        private void dnaso()
+        {
+            Quaternion targetRotation;
+
+            if (_aiBrain.seesEnemy)
+            {
+                targetRotation = _aiBrain._rotateGoal;
+            }
+            else
+            {
+                var steeringVelocity = GetSteering();
+                if (steeringVelocity.sqrMagnitude < 0.0001f) return;
+                
+                targetRotation = Quaternion.LookRotation(steeringVelocity, Vector3.up);
+            }
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, maxSpeed*Time.deltaTime);
+
+        }
         
         private void UpdateRotation()
         {
@@ -91,23 +112,24 @@ namespace Common.AI
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, maxSpeed * Time.deltaTime);
         }
 
-        public void SetDestination(Vector3 destination, bool ignore = false)
+        public bool SetDestination(Vector3 destination, bool ignore = false)
         {
             if (!_agent.pathPending || ignore)
             {
-                Debug.Log("Destination: " + destination);
-                _agent.SetDestination(destination);
-            } else Debug.Log("Could not set destination: " + destination);
+                return _agent.SetDestination(destination);
+            }
+            else
+            {
+                Debug.Log("Could not set destination: " + destination);
+                return false;
+            }
+
+
         }
         
         private void OnUpdateSeparation()
         {
             Vector3 steering = Vector3.zero;
-
-
-            //if (!(_agent.remainingDistance <= _agent.stoppingDistance))
-              //  steering += GetPathStreeing();
-            
             
             steering += Separation(separationRadius, separationStrength) *  separationWeight;
                 

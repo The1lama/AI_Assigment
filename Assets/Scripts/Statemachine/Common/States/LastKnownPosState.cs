@@ -1,6 +1,7 @@
 using System.Collections;
 using Common.AI;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Statemachine.Common.State
 {
@@ -10,6 +11,8 @@ namespace Statemachine.Common.State
         private AiBrain brain;
         private float shootDistance;
         private Vector3 targetPos;
+        private int newTries;
+        private bool validPath;
 
 
         private enum SearchPhase
@@ -27,7 +30,12 @@ namespace Statemachine.Common.State
         public override void OnStateEnter(StateManager me)
         {
             brain = me.aiBrain;
+            newTries = 0;
+            
+            
             targetPos = me.lastKnownPosition;
+
+            brain.rotateOverride = !brain.rotateOverride;
             
             _searchPhase = SearchPhase.Moving;
             _phaseTimer = 0f;
@@ -44,8 +52,10 @@ namespace Statemachine.Common.State
             switch (_searchPhase)
             {
                 case SearchPhase.Moving:
-                    if(!me.agent.pathPending)
+                    if (!me.agent.pathPending)
+                    {
                         me.walkerAgent.SetDestination(targetPos);
+                    }
                     if (!me.agent.pathPending && me.agent.remainingDistance <= 0.5f)
                     {
                         _searchPhase = SearchPhase.LookRight;
@@ -85,9 +95,8 @@ namespace Statemachine.Common.State
 
         public override void OnStateExit(StateManager me)
         {
+            brain.rotateOverride = !brain.rotateOverride;
             me.lastKnownPosition = Vector3.zero;
-            
-            
         }
     }
     

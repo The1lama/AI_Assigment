@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
@@ -90,7 +91,7 @@ namespace Statemachine.Common
             currentState?.OnStateEnter(this);
         }
 
-        public void Update()
+        public virtual void Update()
         {
 
             if(!lastAlive && !CheckLeaderIsAlive())
@@ -123,26 +124,51 @@ namespace Statemachine.Common
             if (isMedi) IfMedic();
             
             currentState?.OnStateUpdate(this);
+            
+            ShootTowardEnemy();
         }
+        
+        
+        private void ShootTowardEnemy()
+        {
+            if (aiBrain.enemyLastKnowPos == null) return;
+            var targetPos = aiBrain.enemyLastKnowPos.transform.position;
+        
+            // if guy to far away to shoot it should walk closer to target and try again if guy sees target
+            var toTarget = (transform.position - targetPos).magnitude;
+            if (toTarget >= aiBrain.shootDistance || !aiBrain.hasLos) return;
+            var angle = aiBrain.AngleToTarget(aiBrain._weapon.transform.forward, (targetPos - transform.position).normalized);
+            if (angle <= 0.98f)
+            {
+                aiBrain.SetVectorRotateTarget(targetPos);
+            }
+            else
+            {
+                aiBrain._weapon.Shoot();
+            }
+        }
+
+        
+        
 
         public abstract void IfMedic();
         
         public List<GameObject> FindHurtComrades()
         {
-            hurtComrades.Clear();// not working right now
-            var size = Physics.OverlapSphereNonAlloc(transform.position, helpRadius, overLapResults, teamLayerMask);
-            for (int i = 0; i < size; i++)
+            hurtComrades.Clear();
+            var size = Physics.OverlapSphere(transform.position, helpRadius);
+            for (int i = 0; i < size.Length; i++)
             {
-                var cHealth = overLapResults[i];
+                var cHealth = size[i];
                 var cHealthComponent =  cHealth.GetComponent<CharacterFactory>();
                 if(cHealthComponent == null || !cHealthComponent.CompareTag(this.gameObject.tag)) continue;
-
                 if(cHealthComponent.needsHealth)
                     hurtComrades.Add(cHealthComponent.gameObject);
             }
-
             return hurtComrades;
         }
+        
+        
 
         private void GetTheGroup()
         {
@@ -163,7 +189,14 @@ namespace Statemachine.Common
                 leftOrRight = -1;
             
             var offsetLook = leader.transform.rotation * Quaternion.Euler(0f, offsetAngle*leftOrRight, 0f);
+            
             aiBrain.SetQuaternionRotation(offsetLook);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if(isMedi)
+                Gizmos.DrawWireSphere(transform.position, helpRadius);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Factory
         
         public abstract LayerMask layerMask { get; set; }
 
-        private Quaternion _rotateGoal;
+        internal Quaternion _rotateGoal;
 
 
         #region Healing & Damage
@@ -22,6 +22,7 @@ namespace Factory
         
         public abstract float health { get; set; }
         public virtual bool needsHealth { get; set; } = false;
+        internal bool seperationOverride = false;
         
         [HideInInspector]public bool canTakeHeal = true;
         [HideInInspector]public bool canTakeDamage = true;
@@ -34,6 +35,8 @@ namespace Factory
             {
                 health = healthMax;
                 needsHealth = false;
+                seperationOverride = true;
+                
             }
             Debug.Log(health);
 
@@ -49,32 +52,23 @@ namespace Factory
 
         public virtual void TakeDamage(float damage)
         {
-            if (!canTakeDamage) return;
             health -= damage;
+            Debug.Log($"{name} Took Damage; Health: {health}");
             if (health <= healthMax / 3) needsHealth = true;
             if (health <= 0)
                 Destroy(this.gameObject);
-            canTakeDamage = false;
-            StartCoroutine(ResetDamageCooldown());
         }
         
-        private IEnumerator ResetDamageCooldown()
-        {
-            yield return new WaitForSeconds(0.2f);
-            canTakeDamage = true;
-        }
 
         #endregion
 
 
         public virtual void Update()
         {
-            if(_rotateGoal != transform.rotation)
-                RotateTowards();
         }
         
         
-        private void RotateTowards()
+        internal void RotateTowards()
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, _rotateGoal, speed*Time.deltaTime);
         }

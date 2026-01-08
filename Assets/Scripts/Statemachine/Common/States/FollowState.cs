@@ -7,6 +7,7 @@ namespace Statemachine.Common.States
         public override void OnStateEnter(StateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
+            me.aiBrain.rotateOverride =  !me.aiBrain.rotateOverride;
         }
 
         public override void OnStateUpdate(StateManager me)
@@ -17,12 +18,11 @@ namespace Statemachine.Common.States
                 me.walkerAgent.SetDestination(me.leader.position);
             }
 
-            if(!me.aiBrain.seesEnemy)
+            if(!me.aiBrain.seesEnemy ||me.aiBrain.enemyLastKnowPos == null)
                 me.RotateOffsetFromLeader();
-            else
+            else if(me.aiBrain.enemyLastKnowPos != null)
             {
-                Debug.Log("Sees Enemy: and Rotating");
-                var ds = me.aiBrain.enemyLastKnowPos;
+                var ds = me.aiBrain.enemyLastKnowPos.transform.position;
                 me.aiBrain.SetVectorRotateTarget(ds);
             }
         }
@@ -30,6 +30,7 @@ namespace Statemachine.Common.States
         public override void OnStateExit(StateManager me)
         {
             me.walkerAgent.rotateGuy = !me.walkerAgent.rotateGuy;
+            me.aiBrain.rotateOverride =  !me.aiBrain.rotateOverride;
         }
     }
 }

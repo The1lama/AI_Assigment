@@ -28,7 +28,7 @@ namespace Weapon
             {
                 var direction = transform.forward.normalized;
                 
-                //BulletSpawn(bulletPrefab, direction,  transform.rotation);
+                BulletSpawn(bulletPrefab, transform.position, transform.rotation);
                 Debug.DrawRay(transform.position, direction*20f, Color.red, 0.5f);
                 
                 // TODO: Add in WeaponFactory a function that spawns in new bullets and fly's towards destination

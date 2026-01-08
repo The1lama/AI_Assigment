@@ -41,17 +41,38 @@ namespace Statemachine.Common.States
                 NavMeshHit hit;
                 if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
                 {
-                    if(me.view.GetDotProduct(hit.position - me.transform.position))
+                    if((hit.position - me.transform.position).magnitude <= 2f)
+                        continue;
+
+                    switch (FiftyFifty(0.6f))
                     {
-                        result = hit.position;
-                        return true;
+                        case true:
+                            if(me.view.GetDotProduct(hit.position - me.transform.position))
+                            {
+                                result = hit.position;
+                                return true;
+                            }
+                            break;
+                        case false:
+                            result = hit.position;
+                            return true;
+                            break;
                     }
+                    
                 }
             }
             result = Vector3.zero;
             return false;
         } 
+        
+        
+        private bool FiftyFifty(float divider = 0.5f)
+        {
+            return Random.value <= divider;
+        }
     }
+    
+    
     
     
     

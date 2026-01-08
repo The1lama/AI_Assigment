@@ -1,21 +1,35 @@
-using System;
+using Common.Interfaces;
+using Factory;
 using UnityEngine;
 
-public class BulletScript : MonoBehaviour
+namespace Weapon
 {
-
-    private Rigidbody rb;
-
-
-    private void Awake()
+    public class BulletScript : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody>();
-    }
 
+        public float speed = 20f;
+        public float lifeTime = 3f;
+        public int damage = 10;
 
-    private void Start()
-    {
-        rb.AddForce(Vector3.forward*0.4f, ForceMode.Impulse);
+        private void Start()
+        {
+            Destroy(gameObject, lifeTime);
+        }
+
+        private void Update()
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+        
+        private void OnCollisionEnter(Collision collision)
+        {
+            var health = collision.gameObject.GetComponent<IHealth>();
+            if (health != null && !collision.gameObject.CompareTag(tag))
+            {
+                collision.gameObject.GetComponent<CharacterFactory>().TakeDamage(damage);
+            }
+            if(collision.gameObject.layer == LayerMask.NameToLayer("Obstacel"))
+                Destroy(gameObject);
+        }
     }
-    
 }

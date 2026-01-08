@@ -21,12 +21,13 @@ namespace Common.AI
         [SerializeField, Range(0,180)] private float setFov = 170f;
         [SerializeField] private LayerMask targetLayerMask;
         public bool seesEnemy = false;
-        public Vector3 enemyLastKnowPos;
+        public GameObject enemyLastKnowPos;
         public bool hasLos;
         
         [Header("Obstacles")]
         [SerializeField] private LayerMask obstacleLayerMask;
 
+        internal bool rotateOverride = false;
 
         private StateManager _stateManager;
         [Header("Squad")]
@@ -141,6 +142,9 @@ namespace Common.AI
             
             TryFindEnemy();
             
+            if(rotateOverride)
+                RotateTowards();
+            
         }
 
         private void TryFindEnemy()
@@ -155,10 +159,8 @@ namespace Common.AI
                     hasLos = hasLOS;
                     continue;
                 }
-                if(CompareTag("Enemy"))
-                    Debug.Log($"<Color=red>TryAndSee Sucsessfull: {hit.name}</Color>");
                 seesEnemy = true;
-                enemyLastKnowPos = lastKnownPosition;
+                enemyLastKnowPos = hit.gameObject;
                 hasLos = hasLOS;
                 break;
             }

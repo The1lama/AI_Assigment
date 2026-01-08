@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Common;
 using Common.AI;
 using Statemachine.Common;
+using Statemachine.Common.State;
 using Statemachine.Common.States;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,6 +21,9 @@ namespace Statemachine.Friendly
             Hold,
             Search,
             Medi,
+            Hunt,
+            LastKnowPos,
+            
         }
 
         public State startState = new State();
@@ -36,6 +40,8 @@ namespace Statemachine.Friendly
             new HoldState(),
             new SearchState(),
             new MediState(),
+            new HuntState(),
+            new LastKnownPosState(),
         };
         public override StateMachineFactory lastState { get; set; }
         public override Vector3 lastKnownPosition { get; set; }
@@ -49,7 +55,12 @@ namespace Statemachine.Friendly
         public override bool isLeader { get; set; } = false;
         public override List<GameObject> _group { get; set; } = new List<GameObject>();
         public override float stopingDistance { get; set; }
-        public override LayerMask teamLayerMask { get; set; }
+
+        public override LayerMask teamLayerMask
+        {
+            get => gameObject.layer; 
+            set => gameObject.layer = value;
+        }
         public override bool lastAlive { get; set; } = false;
 
         #endregion
@@ -159,6 +170,9 @@ namespace Statemachine.Friendly
             
             SwitchState(stateList[(int)State.Follow]);
         }
+        
+        
+        
 
         public override void FixedUpdate()
         {
@@ -169,10 +183,9 @@ namespace Statemachine.Friendly
             // or attack 
             // same with enemyState
             
-            
         }
 
-        
+
         
 
         public override void SwitchToHunt()
@@ -181,7 +194,6 @@ namespace Statemachine.Friendly
 
         public override void SwitchToLastKnownPosition()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void CheckToSwitchLeader()

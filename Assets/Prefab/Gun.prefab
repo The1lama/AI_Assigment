@@ -219,4 +219,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shotCooldown: 2
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 4054545925148638496, guid: 1ac4e94197834ce4d9d87c1d7c58a056, type: 3}

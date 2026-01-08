@@ -21,7 +21,7 @@ public class HuntState : StateMachineFactory
 
     public override void OnStateUpdate(StateManager me)
     {
-        targetPos = brain.enemyLastKnowPos;
+        targetPos = brain.enemyLastKnowPos.transform.position;
         hasLos = brain.hasLos;
         
         // if guy to far away to shoot it should walk closer to target and try again if guy sees target
@@ -40,18 +40,6 @@ public class HuntState : StateMachineFactory
         else
         {
             me.agent.ResetPath();
-        }
-        
-            
-        var angle = brain.AngleToTarget(brain._weapon.transform.forward, targetPos.normalized);
-        if (angle <= 0.98f)
-        {
-            brain.SetVectorRotateTarget(targetPos);
-        }
-        else
-        {
-            brain._weapon.Shoot();
-            Debug.Log("Shoooot");
         }
     }
 

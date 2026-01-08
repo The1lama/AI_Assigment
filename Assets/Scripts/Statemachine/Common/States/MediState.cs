@@ -13,6 +13,7 @@ namespace Statemachine.Common.States
         public override void OnStateEnter(StateManager me)
         {
             _lastPosition = me.transform.position;
+            me.aiBrain.seperationOverride = true;
             
             if(healingParticles == null)
                 healingParticles = me.GetComponentInChildren<ParticleSystem>();
@@ -83,6 +84,7 @@ namespace Statemachine.Common.States
 
         public override void OnStateExit(StateManager me)
         {
+            me.aiBrain.seperationOverride = false;
             me.agent.SetDestination(_lastPosition);
             me.onHealingRoute = false;
             me.walkerAgent.UpdateStopingAgent(me.stopingDistance);

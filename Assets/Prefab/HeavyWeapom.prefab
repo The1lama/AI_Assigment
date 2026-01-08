@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 5006061269410422641}
   m_Layer: 0
   m_Name: HeavyWeapom
-  m_TagString: Untagged
+  m_TagString: Friendly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -392,5 +392,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb2852d63d938142ad193245464066f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shotCooldown: 1
-  bulletPrefab: {fileID: 0}
+  shotCooldown: 2
+  bulletPrefab: {fileID: 4054545925148638496, guid: 1ac4e94197834ce4d9d87c1d7c58a056, type: 3}
