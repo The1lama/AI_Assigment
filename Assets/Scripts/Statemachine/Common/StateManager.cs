@@ -85,6 +85,9 @@ namespace Statemachine.Common
         {
             currentState?.OnStateExit(this);
             lastState = currentState;
+            
+            
+            
             currentState = newState;
             currentState?.OnStateEnter(this);
         }

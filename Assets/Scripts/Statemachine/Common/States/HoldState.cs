@@ -22,7 +22,8 @@ namespace Statemachine.Common.States
         public override void OnStateEnter(StateManager me)
         {
             currentPosition = me.transform;
-            me.walkerAgent.SetDestination(currentPosition.position);
+            
+            me.walkerAgent?.SetDestination(currentPosition.position);
             me.agent.stoppingDistance = 0f;
             
             _phaseTimer = 0f;

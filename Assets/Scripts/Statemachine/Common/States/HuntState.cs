@@ -20,6 +20,11 @@ public class HuntState : StateMachineFactory
 
     public override void OnStateUpdate(StateManager me)
     {
+        if (brain.enemyLastKnowPos == null)
+        {
+            me.SwitchState(me.lastState);
+            return;
+        }
         targetPos = brain.enemyLastKnowPos.transform.position;
         hasLos = brain.hasLos;
         

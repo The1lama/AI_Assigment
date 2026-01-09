@@ -45,6 +45,8 @@ namespace Statemachine.Enemy
             new LastKnownPosState(),
         };
         public override StateMachineFactory lastState { get; set; }
+
+
         public override Vector3 lastKnownPosition { get; set; }
         
         #endregion
@@ -77,7 +79,7 @@ namespace Statemachine.Enemy
         public override bool isMedi { get; set; }
         public override float helpRadius { get; set; }
         public override bool onHealingRoute { get; set; }
-        public override List<GameObject> hurtComrades { get; set; }
+        public override List<GameObject> hurtComrades { get; set; } = new List<GameObject>();
 
 
         public override void IfMedic()
@@ -138,7 +140,7 @@ namespace Statemachine.Enemy
         {
             base.Awake();
             
-            SwitchState(stateList[(int)State.Waypoint]);
+            SwitchState(defaultState);
         }
         
         public override void SwitchToHunt()

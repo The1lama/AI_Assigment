@@ -168,7 +168,7 @@ namespace Statemachine.Friendly
         {
             base.Awake();
             
-            SwitchState(stateList[(int)State.Follow]);
+            SwitchState(defaultState);
         }
 
         public override void SwitchToHunt()

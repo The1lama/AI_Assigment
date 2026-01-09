@@ -9,6 +9,8 @@ namespace Statemachine.Common.State
         private AiBrain brain;
         private float shootDistance;
         private Vector3 targetPos;
+        private Vector3 lastPosition;
+        private Quaternion lastRotation;
 
         private enum SearchPhase
         {
@@ -25,9 +27,9 @@ namespace Statemachine.Common.State
         public override void OnStateEnter(StateManager me)
         {
             brain = me.aiBrain;
-            
-            
             targetPos = me.lastKnownPosition;
+            lastPosition = me.transform.position;
+            lastRotation = me.transform.rotation;
 
             brain.rotateOverride = !brain.rotateOverride;
             
@@ -50,7 +52,7 @@ namespace Statemachine.Common.State
                     {
                         me.walkerAgent.SetDestination(targetPos);
                     }
-                    if (!me.agent.pathPending && me.agent.remainingDistance <= 0.5f)
+                    if (!me.agent.pathPending && me.agent.remainingDistance <= me.agent.stoppingDistance)
                     {
                         _searchPhase = SearchPhase.LookRight;
                         _phaseTimer = 1.5f;
@@ -89,6 +91,8 @@ namespace Statemachine.Common.State
 
         public override void OnStateExit(StateManager me)
         {
+            me.walkerAgent.SetDestination(lastPosition);
+            brain.SetQuaternionRotation(lastRotation);
             brain.rotateOverride = !brain.rotateOverride;
             me.lastKnownPosition = Vector3.zero;
         }

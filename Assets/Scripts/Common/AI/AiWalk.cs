@@ -13,6 +13,8 @@ namespace Common.AI
         private float maxSpeed;
         [HideInInspector] public float stopingDistance;
 
+        private Quaternion targetRotation;
+        
         public bool rotateGuy = true;
         
         #region Seperation
@@ -43,8 +45,8 @@ namespace Common.AI
             allAgents = GameManager.Instance.allEntities;
             _aiBrain = GetComponent<AiBrain>();
             maxSpeed = GetComponent<CharacterFactory>().speed;
-            
             InitializeAgent();
+            
             if (_agent == null)
             {
                 Debug.LogError("No NavMeshAgent component found");
@@ -67,7 +69,7 @@ namespace Common.AI
         {
             if (_agent == null) return;
             
-            if(!_aiBrain.seperationOverride)
+            if(!_aiBrain.seperationOverride && (_aiBrain.leader != this.gameObject))
                 OnUpdateSeparation();
             
             if(_agent.remainingDistance >= 0f)
@@ -75,15 +77,14 @@ namespace Common.AI
             
 
             if (rotateGuy)
-            {
-                //UpdateRotation();
-                dnaso();
-            }
+                UpdateRotation();
+            
+            
+            _agent.nextPosition = transform.position;
         }
 
-        private void dnaso()
+        private void UpdateRotation()
         {
-            Quaternion targetRotation;
 
             if (_aiBrain.seesEnemy)
             {
@@ -101,23 +102,23 @@ namespace Common.AI
 
         }
         
-        private void UpdateRotation()
-        {
-            var steeringVelocity = GetSteering();
-            if (steeringVelocity.magnitude < 0.001f) return;
-            var targetRot = Quaternion.LookRotation(steeringVelocity, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, maxSpeed * Time.deltaTime);
-        }
 
         public bool SetDestination(Vector3 destination, bool ignore = false)
         {
+            if (_agent == null)
+            {
+                Debug.LogWarning("No NavMeshAgent component found");
+                return false;
+            }
             if (!_agent.pathPending || ignore)
             {
                 return _agent.SetDestination(destination);
             }
             else
             {
-                Debug.Log("Could not set destination: " + destination);
+                Debug.LogWarning("Agent: " + gameObject.name);
+                Debug.LogWarning("Path is pending: " + _agent.pathPending);
+                Debug.LogWarning("Could not set destination: " + destination);
                 return false;
             }
 
