@@ -135,9 +135,8 @@ namespace Common.AI
         }
 
 
-        public override void Update()
+        public void Update()
         {
-            base.Update();
             
             TryFindEnemy();
             
@@ -164,7 +163,7 @@ namespace Common.AI
                 break;
             }
         }
-
+        
         private void OnDrawGizmosSelected()
         {
             if (debug)

@@ -75,10 +75,8 @@ namespace Player
         }
 
 
-        public override void Update()
+        public void Update()
         {
-            base.Update();
-            
             TryFindEnemy();
         }
 

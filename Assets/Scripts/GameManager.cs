@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Common.Interfaces;
 using Factory;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -28,8 +26,14 @@ public class GameManager : Singleton<GameManager>
                     );
         hurtAction.performed += HoldActionOnperformed;
         hurtAction.Enable();
-
     }
+
+    private void OnDisable()
+    {
+        
+        if(hurtAction != null) {hurtAction.performed -= HoldActionOnperformed; hurtAction.Disable();}
+    }
+    
 
     private void HoldActionOnperformed(InputAction.CallbackContext obj)
     {

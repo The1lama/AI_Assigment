@@ -107,22 +107,13 @@ namespace Common.AI
         {
             if (_agent == null)
             {
-                Debug.LogWarning("No NavMeshAgent component found");
                 return false;
             }
             if (!_agent.pathPending || ignore)
             {
                 return _agent.SetDestination(destination);
             }
-            else
-            {
-                Debug.LogWarning("Agent: " + gameObject.name);
-                Debug.LogWarning("Path is pending: " + _agent.pathPending);
-                Debug.LogWarning("Could not set destination: " + destination);
-                return false;
-            }
-
-
+            return false;
         }
         
         private void OnUpdateSeparation()
@@ -130,10 +121,8 @@ namespace Common.AI
             Vector3 steering = Vector3.zero;
             
             steering += Separation(separationRadius, separationStrength) *  separationWeight;
-                
 
             if (steering == Vector3.zero) return;
-            
             
             // Limit Steering speed
             steering = Vector3.ClampMagnitude(steering, maxForce);
@@ -155,7 +144,6 @@ namespace Common.AI
         {
             Vector3 seprarationForce = Vector3.zero;
             int neighbourCount = 0;
-            
 
             foreach (var other in allAgents)
             {

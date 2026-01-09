@@ -61,12 +61,6 @@ namespace Factory
         
 
         #endregion
-
-
-        public virtual void Update()
-        {
-        }
-        
         
         internal void RotateTowards()
         {
